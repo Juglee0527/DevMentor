@@ -34,6 +34,7 @@ export function DashboardPage() {
         <nav aria-label="학습 메뉴">
           <Link className="active" to="/dashboard">대시보드</Link>
           <Link to="/learning">학습 현황</Link>
+          <Link to="/review">평가와 복습</Link>
           {localStorage.getItem('devmentorLastRoomId') && (
             <Link to={`/chat/${localStorage.getItem('devmentorLastRoomId')}`}>대화</Link>
           )}

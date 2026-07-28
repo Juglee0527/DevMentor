@@ -30,7 +30,7 @@ ChatMessage 1 ─ N Assessment
 | `skills` | 상위 기술 | code unique |
 | `concepts` | 기술별 개념 | 기술·code 조합 unique |
 | `user_concept_statuses` | 사용자별 이해 상태 | 사용자·개념 unique, 점수 0~100 |
-| `assessments` | 확인 질문 평가 | 점수 0~100, 사용자·개념·메시지 FK |
+| `assessments` | 확인 질문 평가 | 점수 0~100, 사용자·개념·메시지 FK, 사용자·메시지·개념 유일성 |
 
 ## 4. enum
 

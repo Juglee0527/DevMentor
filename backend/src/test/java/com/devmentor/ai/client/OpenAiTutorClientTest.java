@@ -1,6 +1,7 @@
 package com.devmentor.ai.client;
 
 import com.devmentor.ai.dto.AiTutorRequest;
+import com.devmentor.assessment.dto.AssessmentAiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -93,6 +94,51 @@ class OpenAiTutorClientTest {
                 .isInstanceOf(AiClientException.class)
                 .hasMessage("AI 서비스가 요청을 처리하지 못했습니다.")
                 .hasMessageNotContaining("secret detail");
+    }
+
+    @Test
+    void parsesAssessmentBoundaryScores() throws Exception {
+        String perfect = """
+                {
+                  "correct": true,
+                  "score": 100,
+                  "feedback": "정확합니다.",
+                  "correctAnswer": "모범 답안",
+                  "reviewRequired": false
+                }
+                """;
+        String zero = """
+                {
+                  "correct": false,
+                  "score": 0,
+                  "feedback": "다시 학습해 보세요.",
+                  "correctAnswer": "모범 답안",
+                  "reviewRequired": true
+                }
+                """;
+
+        AssessmentAiResponse perfectResult = parser.parseAssessment(apiResponse(perfect));
+        AssessmentAiResponse zeroResult = parser.parseAssessment(apiResponse(zero));
+
+        assertThat(perfectResult.score()).isEqualTo(100);
+        assertThat(zeroResult.score()).isZero();
+    }
+
+    @Test
+    void rejectsAssessmentScoreOutsideRange() throws Exception {
+        String invalid = """
+                {
+                  "correct": true,
+                  "score": 101,
+                  "feedback": "정확합니다.",
+                  "correctAnswer": "모범 답안",
+                  "reviewRequired": false
+                }
+                """;
+
+        assertThatThrownBy(() -> parser.parseAssessment(apiResponse(invalid)))
+                .isInstanceOf(AiClientException.class)
+                .hasMessage("AI 평가 응답이 검증 규칙을 충족하지 못했습니다.");
     }
 
     private String apiResponse(String outputText) throws Exception {

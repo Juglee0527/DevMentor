@@ -141,6 +141,7 @@ export function ChatPage() {
         <nav className="profile-navigation" aria-label="학습 메뉴">
           <Link to="/dashboard">대시보드</Link>
           <Link to="/learning">학습 현황</Link>
+          <Link to="/review">평가와 복습</Link>
         </nav>
         <p className="section-label">LEARNER</p>
         <h2>{user?.nickname ?? '사용자'}</h2>

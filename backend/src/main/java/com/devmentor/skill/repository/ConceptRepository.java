@@ -13,6 +13,18 @@ public interface ConceptRepository extends JpaRepository<Concept, Long> {
 
     Optional<Concept> findBySkillIdAndCode(Long skillId, String code);
 
+    @Query("""
+            select concept
+            from Concept concept
+            join fetch concept.skill skill
+            where skill.code = :skillCode
+              and concept.code = :conceptCode
+            """)
+    Optional<Concept> findBySkillCodeAndConceptCode(
+            @Param("skillCode") String skillCode,
+            @Param("conceptCode") String conceptCode
+    );
+
     List<Concept> findAllBySkillIdOrderByDisplayOrderAsc(Long skillId);
 
     @Query("""

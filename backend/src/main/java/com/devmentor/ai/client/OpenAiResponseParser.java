@@ -1,6 +1,7 @@
 package com.devmentor.ai.client;
 
 import com.devmentor.ai.dto.AiTutorResponse;
+import com.devmentor.assessment.dto.AssessmentAiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +33,24 @@ public class OpenAiResponseParser {
             return new AiTutorResult(response, outputText, true);
         } catch (JsonProcessingException exception) {
             return fallback(outputText);
+        }
+    }
+
+    public AssessmentAiResponse parseAssessment(String responseBody) {
+        String outputText = extractOutputText(responseBody);
+        try {
+            AssessmentAiResponse response = objectMapper.readValue(
+                    outputText,
+                    AssessmentAiResponse.class
+            );
+            Set<ConstraintViolation<AssessmentAiResponse>> violations =
+                    validator.validate(response);
+            if (!violations.isEmpty()) {
+                throw new AiClientException("AI 평가 응답이 검증 규칙을 충족하지 못했습니다.");
+            }
+            return response;
+        } catch (JsonProcessingException exception) {
+            throw new AiClientException("AI 평가 응답 형식을 읽지 못했습니다.", exception);
         }
     }
 

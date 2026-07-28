@@ -2,6 +2,8 @@ package com.devmentor.ai.client;
 
 import com.devmentor.ai.dto.AiTutorRequest;
 import com.devmentor.ai.dto.AiTutorResponse;
+import com.devmentor.assessment.dto.AssessmentAiRequest;
+import com.devmentor.assessment.dto.AssessmentAiResponse;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -47,5 +49,27 @@ public class FakeAiTutorClient implements AiTutorClient {
             ));
         }
         return List.of();
+    }
+
+    @Override
+    public AssessmentAiResponse assess(AssessmentAiRequest request) {
+        String answer = request.userAnswer().toLowerCase();
+        boolean correct = answer.contains("표준") && answer.contains("구현");
+        if (correct) {
+            return new AssessmentAiResponse(
+                    true,
+                    90,
+                    "JPA와 Hibernate의 역할을 올바르게 구분했습니다.",
+                    "JPA는 ORM 표준 명세이고 Hibernate는 대표적인 구현체입니다.",
+                    false
+            );
+        }
+        return new AssessmentAiResponse(
+                false,
+                40,
+                "핵심 역할의 차이를 조금 더 명확히 구분해 보세요.",
+                "JPA는 ORM 표준 명세이고 Hibernate는 대표적인 구현체입니다.",
+                true
+        );
     }
 }

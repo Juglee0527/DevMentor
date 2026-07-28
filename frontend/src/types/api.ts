@@ -112,3 +112,30 @@ export interface SkillLearningStatus {
 export interface LearningStatusOverview {
   skills: SkillLearningStatus[]
 }
+
+export interface ReviewTarget {
+  chatMessageId: number
+  skillCode: string
+  skillName: string
+  conceptCode: string
+  conceptName: string
+  question: string
+  understandingScore: number
+  learningStatus: LearningState
+}
+
+export interface AssessmentResult {
+  id: number
+  chatMessageId: number
+  skillCode: string
+  conceptCode: string
+  conceptName: string
+  question: string
+  userAnswer: string
+  score: number
+  correct: boolean
+  feedback: string
+  correctAnswer: string
+  reviewRequired: boolean
+  createdAt: string
+}

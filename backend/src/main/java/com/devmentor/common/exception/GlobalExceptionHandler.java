@@ -26,6 +26,12 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.failure(exception.getMessage()));
     }
 
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiResponse<Void>> handleConflict(ConflictException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.failure(exception.getMessage()));
+    }
+
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoResourceFound() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)

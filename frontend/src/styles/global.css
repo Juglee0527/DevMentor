@@ -794,6 +794,116 @@ a {
   color: #873f37;
 }
 
+.review-list {
+  display: grid;
+  gap: 24px;
+}
+
+.review-card {
+  padding: 28px;
+  border: 1px solid rgba(25, 34, 29, 0.14);
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.review-meta {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  color: #50705e;
+  font-size: 0.78rem;
+}
+
+.review-meta b {
+  margin-left: auto;
+}
+
+.review-card h2 {
+  margin: 22px 0;
+  font-family: Georgia, "Noto Serif KR", serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.review-card form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+.review-card textarea {
+  min-height: 110px;
+  padding: 14px;
+  border: 1px solid rgba(25, 34, 29, 0.2);
+  background: #fff;
+  font: inherit;
+  resize: vertical;
+}
+
+.review-card button {
+  padding: 0 20px;
+  border: 0;
+  background: #1f4c35;
+  color: #fff;
+  font-weight: 700;
+}
+
+.review-card button:disabled {
+  opacity: 0.6;
+}
+
+.assessment-result {
+  margin-top: 18px;
+  padding: 18px;
+  border-left: 3px solid #3a7653;
+  background: #e1ebe4;
+}
+
+.assessment-result.incorrect {
+  border-left-color: #9a5149;
+  background: #eee0dd;
+}
+
+.assessment-result p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.assessment-result div {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(25, 34, 29, 0.12);
+}
+
+.assessment-result span {
+  color: #66706a;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.assessment-history {
+  margin-top: 48px;
+}
+
+.assessment-history h2 {
+  font-family: Georgia, "Noto Serif KR", serif;
+  font-weight: 500;
+}
+
+.assessment-history article {
+  padding: 16px 0;
+  border-top: 1px solid rgba(25, 34, 29, 0.13);
+}
+
+.assessment-history article > div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.assessment-history article p {
+  margin-bottom: 0;
+  color: #626a65;
+}
+
 @media (max-width: 760px) {
   .navigation,
   .hero {
@@ -890,5 +1000,13 @@ a {
 
   .concept-table b {
     display: none;
+  }
+
+  .review-card form {
+    grid-template-columns: 1fr;
+  }
+
+  .review-card button {
+    min-height: 48px;
   }
 }

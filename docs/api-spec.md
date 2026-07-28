@@ -176,7 +176,7 @@ GET /api/learning/recommendations?userId={userId}
 | 평가 정답 | `+20` | 80점 미만 `LEARNING`, 이상 `UNDERSTOOD` | 3일 또는 7일 후 |
 | 평가 오답 | `-20` | `NEEDS_REVIEW` | 1일 후 |
 
-점수는 항상 0~100으로 제한합니다. 평가 정답·오답 규칙은 7단계에서 평가 저장 흐름에 연결합니다.
+점수는 항상 0~100으로 제한합니다. 평가 저장 시 정답은 `+20`, 오답은 `-20` 규칙을 적용합니다.
 
 ## 8. 대시보드 API
 
@@ -218,15 +218,74 @@ GET /api/learning/status?userId={userId}
 
 대시보드와 학습 현황은 기술·개념 fetch 조회와 사용자 상태 fetch 조회를 사용하며, 사용자별 데이터 크기가 증가해도 개념마다 추가 SQL을 실행하지 않습니다.
 
-## 10. 공통 오류
+## 10. 평가와 복습 API
+
+복습 대상:
+
+```http
+GET /api/reviews?userId={userId}
+```
+
+점수 80 미만인 개념 중 최근 AI 답변에 미제출 확인 질문이 있는 항목을 반환합니다.
+
+평가 제출:
+
+```http
+POST /api/assessments
+```
+
+```json
+{
+  "userId": 1,
+  "chatMessageId": 2,
+  "skillCode": "JPA",
+  "conceptCode": "JPA_HIBERNATE_RELATION",
+  "userAnswer": "JPA는 ORM 표준 명세이고 Hibernate는 구현체입니다."
+}
+```
+
+성공 데이터:
+
+```json
+{
+  "id": 1,
+  "chatMessageId": 2,
+  "skillCode": "JPA",
+  "conceptCode": "JPA_HIBERNATE_RELATION",
+  "conceptName": "JPA와 Hibernate 관계",
+  "question": "JPA와 Hibernate의 관계를 설명해 보세요.",
+  "userAnswer": "JPA는 ORM 표준 명세이고 Hibernate는 구현체입니다.",
+  "score": 90,
+  "correct": true,
+  "feedback": "역할을 올바르게 구분했습니다.",
+  "correctAnswer": "JPA는 ORM 표준 명세이고 Hibernate는 대표적인 구현체입니다.",
+  "reviewRequired": false,
+  "createdAt": "2026-07-28T18:00:00"
+}
+```
+
+평가 이력:
+
+```http
+GET /api/assessments?userId={userId}
+```
+
+- AI 평가 점수는 0~100이어야 하며 70점 이상과 `correct=true`가 일치해야 합니다.
+- 오답 평가에는 `reviewRequired=true`가 필요합니다.
+- 평가 AI 파싱·검증 실패는 일반 텍스트 fallback 없이 `502`로 반환합니다.
+- 같은 사용자·AI 메시지·개념 조합을 다시 제출하면 `409 Conflict`입니다.
+- 외부 AI 호출 후 평가 저장과 개념 상태 갱신은 하나의 트랜잭션입니다.
+
+## 11. 공통 오류
 
 | HTTP 상태 | 조건 | 메시지 원칙 |
 | --- | --- | --- |
 | `400 Bad Request` | Bean Validation 실패 | 첫 번째 사용자 입력 오류 |
 | `404 Not Found` | 도메인 리소스 또는 요청 경로 없음 | 리소스 또는 경로 미존재 안내 |
+| `409 Conflict` | 같은 확인 질문 중복 제출 | 이미 제출한 질문 안내 |
 | `502 Bad Gateway` | 외부 AI 연결·응답 실패 | 재시도를 안내하는 고정 메시지 |
 | `500 Internal Server Error` | 처리하지 못한 내부 오류 | 고정된 일반 오류 메시지 |
 
-## 11. 이후 추가 예정
+## 12. 이후 추가 예정
 
-평가와 복습 API는 아직 구현되지 않았습니다. 7단계에서 실제 요청·응답 DTO와 함께 이 문서를 갱신합니다.
+MVP API 구현은 완료되었습니다. 인증, 소셜 로그인, Repository 분석, 면접 모드, RAG는 현재 API 범위에 포함하지 않습니다.
