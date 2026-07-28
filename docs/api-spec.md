@@ -101,7 +101,43 @@ GET /api/chat-rooms/{chatRoomId}/messages?userId={userId}
 }
 ```
 
-3단계에서는 `USER` 메시지만 저장합니다. AI 답변은 4단계에서 같은 endpoint 응답 계약을 확장합니다.
+AI 답변 생성 성공 응답의 `data`:
+
+```json
+{
+  "userMessage": {
+    "id": 1,
+    "role": "USER",
+    "content": "Hibernate가 뭐예요?",
+    "createdAt": "2026-07-28T10:00:00"
+  },
+  "assistantMessage": {
+    "id": 2,
+    "role": "ASSISTANT",
+    "content": "Hibernate는 JPA 구현체 중 하나입니다.",
+    "createdAt": "2026-07-28T10:00:01"
+  },
+  "analysis": {
+    "answer": "Hibernate는 JPA 구현체 중 하나입니다.",
+    "detectedConcepts": [
+      {
+        "skillCode": "JPA",
+        "conceptCode": "JPA_HIBERNATE_RELATION",
+        "confidence": 0.9
+      }
+    ],
+    "knowledgeGaps": [],
+    "followUpQuestion": "JPA와 Hibernate의 역할 차이를 설명해 보시겠어요?",
+    "recommendedConcepts": []
+  },
+  "structured": true
+}
+```
+
+- 최근 메시지는 현재 질문을 제외하고 최대 10개를 AI 문맥에 포함합니다.
+- JSON 파싱 또는 DTO 검증에 실패하면 `structured=false`, 빈 분석 배열과 일반 텍스트 답변을 반환합니다.
+- 사용자 메시지와 AI 메시지는 모두 PostgreSQL에 저장됩니다.
+- 외부 AI 호출 전에 사용자 메시지를 별도 트랜잭션으로 저장합니다. 호출 실패 시 질문은 유지되고 AI 메시지는 저장되지 않습니다.
 
 ## 6. 공통 오류
 
@@ -109,8 +145,9 @@ GET /api/chat-rooms/{chatRoomId}/messages?userId={userId}
 | --- | --- | --- |
 | `400 Bad Request` | Bean Validation 실패 | 첫 번째 사용자 입력 오류 |
 | `404 Not Found` | 도메인 리소스 또는 요청 경로 없음 | 리소스 또는 경로 미존재 안내 |
+| `502 Bad Gateway` | 외부 AI 연결·응답 실패 | 재시도를 안내하는 고정 메시지 |
 | `500 Internal Server Error` | 처리하지 못한 내부 오류 | 고정된 일반 오류 메시지 |
 
 ## 7. 이후 추가 예정
 
-AI 응답, 학습 상태, 대시보드, 평가 API는 아직 구현되지 않았습니다. 각 개발 단계에서 실제 요청·응답 DTO와 함께 이 문서를 갱신합니다.
+학습 상태, 대시보드, 평가 API는 아직 구현되지 않았습니다. 각 개발 단계에서 실제 요청·응답 DTO와 함께 이 문서를 갱신합니다.

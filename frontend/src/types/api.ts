@@ -27,3 +27,25 @@ export interface ChatMessage {
   content: string
   createdAt: string
 }
+
+export interface ConceptSignal {
+  skillCode: string
+  conceptCode: string
+  confidence?: number
+  reason?: string
+}
+
+export interface AiTutorAnalysis {
+  answer: string
+  detectedConcepts: ConceptSignal[]
+  knowledgeGaps: ConceptSignal[]
+  followUpQuestion: string | null
+  recommendedConcepts: ConceptSignal[]
+}
+
+export interface ChatExchange {
+  userMessage: ChatMessage
+  assistantMessage: ChatMessage
+  analysis: AiTutorAnalysis
+  structured: boolean
+}

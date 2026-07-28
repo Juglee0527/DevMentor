@@ -70,12 +70,16 @@ class ChatApiIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"content\":\"Hibernate가 뭐예요?\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.role").value("USER"));
+                .andExpect(jsonPath("$.data.userMessage.role").value("USER"))
+                .andExpect(jsonPath("$.data.assistantMessage.role").value("ASSISTANT"))
+                .andExpect(jsonPath("$.data.analysis.followUpQuestion").isNotEmpty())
+                .andExpect(jsonPath("$.data.structured").value(true));
 
         mockMvc.perform(get("/api/chat-rooms/{roomId}/messages", roomId)
                         .queryParam("userId", String.valueOf(userId)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].content").value("Hibernate가 뭐예요?"));
+                .andExpect(jsonPath("$.data[0].content").value("Hibernate가 뭐예요?"))
+                .andExpect(jsonPath("$.data[1].role").value("ASSISTANT"));
 
         mockMvc.perform(get("/api/chat-rooms/{roomId}", roomId)
                         .queryParam("userId", String.valueOf(otherUser.getId())))

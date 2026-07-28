@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { createChatRoom, deleteChatRoom, getChatRooms, getMessages, sendMessage } from '../api/chat'
 import { getUser } from '../api/users'
 import { getApiErrorMessage } from '../api/client'
-import type { ChatMessage, ChatRoom, User } from '../types/api'
+import type { AiTutorAnalysis, ChatMessage, ChatRoom, User } from '../types/api'
 
 export function ChatPage() {
   const navigate = useNavigate()
@@ -17,6 +17,7 @@ export function ChatPage() {
   const [newTitle, setNewTitle] = useState('')
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
+  const [latestAnalysis, setLatestAnalysis] = useState<AiTutorAnalysis | null>(null)
 
   useEffect(() => {
     if (!userId || !roomId) {
@@ -38,8 +39,13 @@ export function ChatPage() {
     setSending(true)
     setError('')
     try {
-      const message = await sendMessage(roomId, userId, content)
-      setMessages((current) => [...current, message])
+      const exchange = await sendMessage(roomId, userId, content)
+      setMessages((current) => [
+        ...current,
+        exchange.userMessage,
+        exchange.assistantMessage,
+      ])
+      setLatestAnalysis(exchange.analysis)
       setContent('')
     } catch (requestError) {
       setError(getApiErrorMessage(requestError))
@@ -95,13 +101,32 @@ export function ChatPage() {
           <button className="delete-room" type="button" onClick={handleDeleteRoom}>대화방 삭제</button>
         </header>
         <div className="message-list" aria-live="polite">
-          {messages.length === 0 && <div className="empty-message"><strong>첫 질문을 남겨보세요.</strong><span>현재 단계에서는 메시지를 안전하게 저장합니다. AI 답변은 다음 단계에서 연결됩니다.</span></div>}
+          {messages.length === 0 && <div className="empty-message"><strong>첫 질문을 남겨보세요.</strong><span>학습 목표와 최근 대화를 바탕으로 AI 멘토가 맞춤 답변을 제공합니다.</span></div>}
           {messages.map((message) => (
             <article className={`message ${message.role.toLowerCase()}`} key={message.id}>
               <span>{message.role === 'USER' ? '나' : 'DevMentor'}</span>
               <p>{message.content}</p>
             </article>
           ))}
+          {latestAnalysis?.followUpQuestion && (
+            <section className="mentor-insight">
+              <span>확인 질문</span>
+              <p>{latestAnalysis.followUpQuestion}</p>
+            </section>
+          )}
+          {latestAnalysis && latestAnalysis.recommendedConcepts.length > 0 && (
+            <section className="mentor-insight">
+              <span>추천 개념</span>
+              <ul>
+                {latestAnalysis.recommendedConcepts.map((concept) => (
+                  <li key={`${concept.skillCode}-${concept.conceptCode}`}>
+                    <strong>{concept.skillCode} · {concept.conceptCode}</strong>
+                    {concept.reason && <p>{concept.reason}</p>}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
         {error && <p className="form-error chat-error">{error}</p>}
         <form className="message-form" onSubmit={handleSend}>

@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { ApiResponse, ChatMessage, ChatRoom } from '../types/api'
+import type { ApiResponse, ChatExchange, ChatMessage, ChatRoom } from '../types/api'
 
 export async function createChatRoom(
   userId: number,
@@ -34,8 +34,8 @@ export async function sendMessage(
   roomId: number,
   userId: number,
   content: string,
-): Promise<ChatMessage> {
-  const response = await apiClient.post<ApiResponse<ChatMessage>>(
+): Promise<ChatExchange> {
+  const response = await apiClient.post<ApiResponse<ChatExchange>>(
     `/chat-rooms/${roomId}/messages`,
     { content },
     { params: { userId } },

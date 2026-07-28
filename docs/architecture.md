@@ -2,68 +2,69 @@
 
 ## 1. 현재 범위
 
-이 문서는 3단계까지 실제 구현된 구조를 설명합니다. 학습 상태와 AI 연동 구조는 해당 개발 단계에서 코드와 함께 확장합니다.
+이 문서는 4단계까지 실제 구현된 사용자·대화·AI 멘토 구조를 설명합니다. 학습 상태 반영과 평가는 이후 단계에서 확장합니다.
 
 ## 2. 시스템 구성
 
 ```text
 Browser
-  │  http://localhost:5173
-  ▼
-React + TypeScript + Vite
-  │  Axios /api
+  │  React + TypeScript + Axios
   ▼
 Spring Boot :8080
-  │  Spring Data JPA
+  ├─ 사용자·대화 서비스
+  ├─ AI 문맥 구성
+  └─ AiTutorClient
+       ├─ FakeAiTutorClient (기본 로컬·테스트)
+       └─ OpenAiTutorClient (Responses API)
+  │
   ▼
 PostgreSQL :5432
 ```
 
 ### Frontend
 
-- `BrowserRouter`가 화면 경로를 관리합니다.
-- Axios 공통 인스턴스가 `VITE_API_BASE_URL`을 사용합니다.
-- 시작 화면은 `/api/health`를 호출하여 백엔드 연결 여부를 표시합니다.
 - 시작 화면에서 사용자와 첫 대화방을 생성합니다.
-- 대화 화면에서 대화방과 사용자 메시지를 실제 API로 저장·조회합니다.
+- 대화 화면은 사용자 질문과 AI 답변을 실제 API로 저장·조회합니다.
+- 최신 구조화 응답의 확인 질문과 추천 개념을 별도 카드로 표시합니다.
+- Axios 공통 인스턴스가 `VITE_API_BASE_URL`을 사용합니다.
 
 ### Backend
 
-- `HealthController`가 실행 상태를 제공합니다.
-- 사용자·대화 서비스가 소유권과 입력 조건을 검증합니다.
-- `ApiResponse`가 성공·실패 응답 형태를 통일합니다.
-- `GlobalExceptionHandler`가 검증, 미존재 리소스, 예상하지 못한 오류를 변환합니다.
-- 예상하지 못한 내부 예외는 서버에 기록하되 상세 메시지를 클라이언트에 노출하지 않습니다.
-- CORS는 `FRONTEND_ORIGIN` 한 개만 허용합니다.
+- 사용자·대화 서비스가 입력과 리소스 소유권을 검증합니다.
+- `AiContextService`가 사용자 프로필, 관심 기술, 기존 개념 상태, 최근 메시지 최대 10개를 읽습니다.
+- `AiTutorClient`가 외부 AI 경계를 정의하고 Fake와 OpenAI 구현을 분리합니다.
+- OpenAI 구현은 JDK `HttpClient`로 Responses API를 호출하며 JSON Schema 구조화 출력을 요청합니다.
+- 외부 응답은 Jackson 파싱 후 Bean Validation으로 다시 검증합니다.
+- 파싱·필드 검증 실패는 일반 텍스트 답변으로 전환하고, 연결·HTTP 오류는 `502`로 변환합니다.
+- API Key, 프롬프트, 외부 오류 본문은 로그에 남기지 않습니다.
 
 ### Database
 
-- Docker Compose가 PostgreSQL 17 컨테이너와 영속 volume을 관리합니다.
-- `pg_isready` 기반 health check로 연결 준비 여부를 판단합니다.
-- 현재 Entity는 없으며 2단계에서 데이터 모델과 스키마를 추가합니다.
+- PostgreSQL 17에 사용자, 대화, 메시지, 기술·개념, 학습 상태, 평가 Entity를 저장합니다.
+- AI 답변 본문은 `ChatMessage.content`, 검증된 분석 DTO는 `analysis_json` text 컬럼에 JSON으로 저장합니다.
+- 로컬은 `ddl-auto=update`, 테스트는 `create-drop`이며 운영 전 migration 도구가 필요합니다.
 
-## 3. 현재 요청 흐름
+## 3. 메시지 처리 흐름과 트랜잭션
 
 ```text
-시작 화면 로드
-→ getApiHealth()
-→ GET /api/health
-→ ApiResponse<HealthResponse>
-→ 화면에 API 연결 상태 표시
+소유권 확인·AI 문맥 조회
+→ USER 메시지 별도 트랜잭션 저장
+→ AiTutorClient 호출
+→ 구조화 응답 검증 또는 텍스트 fallback
+→ ASSISTANT 메시지와 분석 JSON 별도 트랜잭션 저장
+→ 사용자·AI 메시지와 분석 응답 반환
 ```
 
-## 4. 설정 경계
+외부 네트워크 호출 중 DB 트랜잭션을 오래 유지하지 않기 위해 저장 단계를 분리합니다. 따라서 AI 연결 실패 시 사용자 질문은 남고 AI 답변은 없습니다. 사용자는 같은 질문을 다시 보낼 수 있으며, 자동 재시도나 중복 제거는 현재 MVP 범위에 포함하지 않습니다.
 
-- DB 연결값은 환경변수로 재정의할 수 있습니다.
-- 프론트엔드 API 주소는 `VITE_API_BASE_URL`로 관리합니다.
-- 백엔드 CORS Origin은 `FRONTEND_ORIGIN`으로 관리합니다.
-- API Key와 모델 설정은 파일에 고정하지 않습니다.
+## 4. AI 설정 경계
+
+- `AI_CLIENT_MODE=fake`가 기본이며 API Key 없이 로컬·테스트에서 동작합니다.
+- 실제 호출은 `AI_CLIENT_MODE=openai`와 비어 있지 않은 `OPENAI_API_KEY`, `OPENAI_MODEL`이 모두 필요합니다.
+- 모델명과 API Key는 코드에 고정하지 않습니다.
+- `OPENAI_TIMEOUT_SECONDS`로 전체 요청 제한 시간을 설정합니다.
+- OpenAI 응답 본문에서 `output_text`를 찾아 구조화 DTO로 변환합니다.
 
 ## 5. 다음 변경 예정
 
-2단계에서 다음 내용이 추가됩니다.
-
-- 핵심 Entity와 Repository
-- Entity 관계와 DB 제약조건
-- 초기 기술·개념 데이터
-- PostgreSQL Testcontainers 통합 테스트
+5단계에서 AI가 반환한 감지 개념과 지식 공백을 검증된 상태 전이 규칙으로 `UserConceptStatus`에 반영합니다.

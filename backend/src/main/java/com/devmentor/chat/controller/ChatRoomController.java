@@ -1,5 +1,6 @@
 package com.devmentor.chat.controller;
 
+import com.devmentor.ai.service.AiChatService;
 import com.devmentor.chat.dto.*;
 import com.devmentor.chat.service.ChatService;
 import com.devmentor.common.response.ApiResponse;
@@ -13,9 +14,11 @@ import java.util.List;
 public class ChatRoomController {
 
     private final ChatService chatService;
+    private final AiChatService aiChatService;
 
-    public ChatRoomController(ChatService chatService) {
+    public ChatRoomController(ChatService chatService, AiChatService aiChatService) {
         this.chatService = chatService;
+        this.aiChatService = aiChatService;
     }
 
     @PostMapping
@@ -46,14 +49,14 @@ public class ChatRoomController {
     }
 
     @PostMapping("/{roomId}/messages")
-    public ApiResponse<MessageResponse> sendMessage(
+    public ApiResponse<ChatExchangeResponse> sendMessage(
             @PathVariable Long roomId,
             @RequestParam Long userId,
             @Valid @RequestBody MessageRequest request
     ) {
         return ApiResponse.success(
-                "메시지를 저장했습니다.",
-                chatService.saveUserMessage(roomId, userId, request)
+                "AI 멘토 답변을 생성했습니다.",
+                aiChatService.sendMessage(roomId, userId, request)
         );
     }
 

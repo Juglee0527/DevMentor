@@ -71,6 +71,24 @@ public class ChatService {
         return MessageResponse.from(messageRepository.save(message));
     }
 
+    @Transactional
+    public MessageResponse saveAssistantMessage(
+            Long roomId,
+            Long userId,
+            String content,
+            String analysisJson
+    ) {
+        ChatRoom room = findOwnedRoom(roomId, userId);
+        ChatMessage message = new ChatMessage(
+                room,
+                MessageRole.ASSISTANT,
+                content,
+                analysisJson
+        );
+        room.markActive();
+        return MessageResponse.from(messageRepository.save(message));
+    }
+
     public List<MessageResponse> getMessages(Long roomId, Long userId) {
         findOwnedRoom(roomId, userId);
         return messageRepository.findAllByChatRoomIdOrderByCreatedAtAsc(roomId).stream()

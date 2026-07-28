@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
+    boolean existsByIdAndUserId(Long id, Long userId);
+
     List<ChatRoom> findAllByUserIdOrderByUpdatedAtDesc(Long userId);
 
     Optional<ChatRoom> findByIdAndUserId(Long id, Long userId);

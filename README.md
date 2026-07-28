@@ -6,7 +6,7 @@ DevMentor는 단발성 개발 질문 챗봇이 아니라 대화와 평가 결과
 
 ## 현재 구현 상태
 
-현재 **3단계: 사용자와 대화 기본 기능**까지 구현되었습니다.
+현재 **4단계: AI 멘토 연동**까지 구현되었습니다.
 
 | 영역 | 구현 상태 |
 | --- | --- |
@@ -18,8 +18,9 @@ DevMentor는 단발성 개발 질문 챗봇이 아니라 대화와 평가 결과
 | 초기 데이터 | 기술 9개, 핵심 개념 19개 |
 | 사용자 기능 | 프로필 생성·조회·수정과 관심 기술 |
 | 대화 기능 | 대화방 생성·조회·삭제, 사용자 메시지 저장·조회 |
+| AI 멘토 | Fake/OpenAI Client 분리, 구조화 답변, 텍스트 fallback, 대화 화면 연동 |
 
-사용자, 대화, AI 멘토, 학습 상태, 평가 기능은 이후 단계에서 구현합니다. 세부 순서는 [개발 로드맵](./docs/development-roadmap.md)을 기준으로 합니다.
+학습 상태, 대시보드, 평가 기능은 이후 단계에서 구현합니다. 세부 순서는 [개발 로드맵](./docs/development-roadmap.md)을 기준으로 합니다.
 
 ## 기술 스택
 
@@ -92,8 +93,12 @@ Copy-Item .env.example .env
 | `POSTGRES_PORT` | `5432` | 호스트 DB 포트 |
 | `VITE_API_BASE_URL` | `http://localhost:8080/api` | 프론트엔드 API 주소 |
 | `FRONTEND_ORIGIN` | `http://localhost:5173` | 백엔드가 허용하는 프론트엔드 Origin |
-| `OPENAI_API_KEY` | 빈 값 | 4단계에서 사용 |
-| `OPENAI_MODEL` | 빈 값 | 4단계에서 사용 |
+| `AI_CLIENT_MODE` | `fake` | `fake` 또는 `openai` AI 구현 선택 |
+| `OPENAI_API_KEY` | 빈 값 | OpenAI 모드 인증 Key |
+| `OPENAI_MODEL` | 빈 값 | OpenAI 모드에서 사용할 모델 |
+| `OPENAI_TIMEOUT_SECONDS` | `30` | OpenAI 응답 제한 시간 |
+
+기본 `fake` 모드는 API Key 없이 결정적인 멘토 답변을 반환하므로 로컬 개발과 테스트에 사용합니다. 실제 OpenAI API를 사용하려면 `.env`에서 `AI_CLIENT_MODE=openai`, `OPENAI_API_KEY`, `OPENAI_MODEL`을 모두 설정합니다.
 
 ## 실행 방법
 
@@ -172,7 +177,7 @@ npm run lint
 1. ~~실행 가능한 프로젝트 골격~~
 2. ~~핵심 데이터 모델~~
 3. ~~사용자와 대화 기본 기능~~
-4. AI 멘토 연동
+4. ~~AI 멘토 연동~~
 5. 학습 상태 분석
 6. 대시보드와 학습 현황
 7. 평가와 복습

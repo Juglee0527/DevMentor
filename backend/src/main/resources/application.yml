@@ -23,3 +23,10 @@ server:
 app:
   cors:
     allowed-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+  ai:
+    mode: ${AI_CLIENT_MODE:fake}
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:}
+      timeout-seconds: ${OPENAI_TIMEOUT_SECONDS:30}

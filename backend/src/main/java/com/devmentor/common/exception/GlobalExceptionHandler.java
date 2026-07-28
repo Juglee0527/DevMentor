@@ -1,5 +1,6 @@
 package com.devmentor.common.exception;
 
+import com.devmentor.ai.client.AiClientException;
 import com.devmentor.common.response.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -53,6 +54,13 @@ public class GlobalExceptionHandler {
                 .orElse("요청값이 올바르지 않습니다.");
 
         return ResponseEntity.badRequest().body(ApiResponse.failure(message));
+    }
+
+    @ExceptionHandler(AiClientException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAiClient(AiClientException exception) {
+        log.warn("AI service request failed: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.failure("AI 멘토가 일시적으로 응답하지 못했습니다. 잠시 후 다시 시도해 주세요."));
     }
 
     @ExceptionHandler(Exception.class)

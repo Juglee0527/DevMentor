@@ -428,6 +428,34 @@ a {
   background: #dce6de;
 }
 
+.mentor-insight {
+  max-width: 72%;
+  padding: 16px 18px;
+  border-left: 3px solid #50705e;
+  background: #ebe8dd;
+}
+
+.mentor-insight > span {
+  color: #50705e;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.mentor-insight p {
+  margin: 8px 0 0;
+  line-height: 1.6;
+}
+
+.mentor-insight ul {
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+
+.mentor-insight li + li {
+  margin-top: 10px;
+}
+
 .chat-error {
   padding: 0 36px;
 }
