@@ -77,4 +77,19 @@ public class User extends BaseEntity {
     public void addInterestedSkill(Skill skill) {
         interestedSkills.add(skill);
     }
+
+    public void update(
+            String nickname,
+            int careerYears,
+            String currentRole,
+            String learningGoal,
+            Set<Skill> skills
+    ) {
+        this.nickname = nickname;
+        this.careerYears = careerYears;
+        this.currentRole = currentRole;
+        this.learningGoal = learningGoal;
+        interestedSkills.clear();
+        interestedSkills.addAll(skills);
+    }
 }

@@ -28,6 +28,10 @@ public abstract class BaseEntity {
         updatedAt = LocalDateTime.now();
     }
 
+    protected void touch() {
+        updatedAt = LocalDateTime.now();
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

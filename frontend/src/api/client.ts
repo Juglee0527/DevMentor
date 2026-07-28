@@ -1,4 +1,5 @@
 import axios from 'axios'
+import type { ApiResponse } from '../types/api'
 
 const DEFAULT_API_BASE_URL = 'http://localhost:8080/api'
 
@@ -10,3 +11,9 @@ export const apiClient = axios.create({
   },
 })
 
+export function getApiErrorMessage(error: unknown): string {
+  if (axios.isAxiosError<ApiResponse<null>>(error)) {
+    return error.response?.data.message ?? '서버에 연결할 수 없습니다.'
+  }
+  return '요청을 처리하지 못했습니다.'
+}

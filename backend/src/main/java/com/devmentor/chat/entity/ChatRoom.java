@@ -41,4 +41,8 @@ public class ChatRoom extends BaseEntity {
     public String getTitle() {
         return title;
     }
+
+    public void markActive() {
+        touch();
+    }
 }
