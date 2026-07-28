@@ -2,9 +2,9 @@
 
 ## 1. 현재 상태
 
-- 현재 단계: `0단계 - 요구사항과 작업 체계 확정`
+- 현재 단계: `1단계 - 실행 가능한 프로젝트 골격`
 - 상태: `완료`
-- 다음 작업: `1.1 프로젝트 구조 생성`
+- 다음 작업: `2.1 사용자·대화 Entity`
 - 마지막 갱신일: `2026-07-28`
 
 ## 2. 단계별 진행률
@@ -12,7 +12,7 @@
 | 단계 | 상태 | 완료 작업 |
 | --- | --- | --- |
 | 0. 요구사항과 작업 체계 | 완료 | 제품 요구사항, 개발 로드맵, 진행 기록 |
-| 1. 프로젝트 초기화 | 대기 | - |
+| 1. 프로젝트 초기화 | 완료 | 구조, PostgreSQL, Spring Boot, React, 공통 API |
 | 2. 핵심 데이터 모델 | 대기 | - |
 | 3. 사용자와 대화 기본 기능 | 대기 | - |
 | 4. AI 멘토 연동 | 대기 | - |
@@ -22,6 +22,50 @@
 | 8. 통합 검증과 문서 | 대기 | - |
 
 ## 3. 변경 기록
+
+### 2026-07-28 - 1단계 실행 가능한 프로젝트 골격
+
+작업 범위:
+
+- 루트 환경변수, Git 제외 규칙, Docker Compose 구성
+- Spring Boot 3.5.6과 Gradle Wrapper 초기화
+- PostgreSQL 연결, 공통 응답, 예외 처리, CORS, health API 구현
+- React, TypeScript, Vite, Router, Axios 초기화
+- 백엔드 연결 상태를 표시하는 시작 화면 구현
+- 현재 구현에 맞게 README, 아키텍처, API 문서 갱신
+
+변경 파일:
+
+- 루트: `.gitignore`, `.env.example`, `docker-compose.yml`, `README.md`
+- 백엔드: `backend/build.gradle`, Gradle Wrapper, `backend/src`
+- 프론트엔드: `frontend/package.json`, `frontend/package-lock.json`, `frontend/src`
+- 문서: `docs/architecture.md`, `docs/api-spec.md`, `docs/development-roadmap.md`, `docs/progress.md`
+
+주요 결정:
+
+- 공통 응답은 불필요한 상속 구조 없이 generic Java record로 구현
+- 전역 예외 처리에서 내부 오류 상세를 고정 메시지로 치환
+- 루트 `.env` 하나를 Docker Compose, Spring Boot, Vite가 공유하도록 명시적으로 구성
+- Vite가 5173 충돌 시 다른 포트로 자동 이동하지 않도록 `strictPort` 적용
+- 시작 화면은 Mock 학습 데이터 대신 실제 health API 연결 상태만 표시
+- DB Entity와 Testcontainers는 데이터 모델을 정의하는 2단계에서 구현
+
+검증:
+
+- `docker compose config --quiet`: 성공
+- `docker compose up -d postgres`: 성공
+- `docker compose ps`: PostgreSQL `healthy`
+- `backend\gradlew.bat test`: 성공, 5개 테스트 통과
+- `frontend\npm run build`: 성공
+- `frontend\npm run lint`: 성공
+- 브라우저 `http://127.0.0.1:5174`: 시작 화면 렌더링 및 `API 연결됨` 확인
+- `GET http://127.0.0.1:8080/api/health`: `success=true`, `status=UP`
+
+남은 위험 및 다음 작업:
+
+- 로컬의 5173 포트가 다른 프로젝트에서 사용 중이었으며 기본 실행 시 해당 프로세스를 먼저 종료하거나 CORS와 프론트엔드 포트를 함께 변경해야 함
+- `npm audit`은 React Router의 RSC 서버 기능 관련 high advisory 2건을 보고함. 현재 앱은 브라우저 SPA이며 해당 RSC 기능을 사용하지 않지만, 수정 버전 공개 여부를 다음 프론트엔드 작업에서 다시 확인해야 함
+- 2단계에서 DB migration 방식과 Entity 제약조건을 먼저 확정해야 함
 
 ### 2026-07-28 - 문서 관리 체계 생성
 
@@ -87,4 +131,3 @@
 
 - 
 ```
-

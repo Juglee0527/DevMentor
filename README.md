@@ -2,176 +2,176 @@
 
 > AI가 당신의 개발 실력을 분석하고, 부족한 부분을 찾아 성장 경로를 제안하는 개인 개발 멘토
 
-## 프로젝트 소개
+DevMentor는 단발성 개발 질문 챗봇이 아니라 대화와 평가 결과를 누적하여 사용자의 이해 수준을 파악하고 다음 학습 경로를 제안하는 서비스입니다.
 
-DevMentor는 단순히 질문에 답하는 AI가 아닙니다.
+## 현재 구현 상태
 
-사용자와의 지속적인 대화를 통해 개발 지식을 분석하고,
+현재 **1단계: 실행 가능한 프로젝트 골격**까지 구현되었습니다.
 
-- 무엇을 알고 있는지
-- 무엇을 모르고 있는지
-- 어떤 순서로 공부해야 하는지
+| 영역 | 구현 상태 |
+| --- | --- |
+| PostgreSQL | Docker Compose, 환경변수, health check |
+| Backend | Spring Boot 3.5.6, DB 연결, 공통 응답·예외·CORS, health API |
+| Frontend | React, TypeScript, Vite, Router, Axios, 시작 화면 |
+| 연결 검증 | 시작 화면에서 백엔드 API 연결 상태 표시 |
 
-를 판단하여 개인 맞춤형 학습 로드맵을 제공합니다.
+사용자, 대화, AI 멘토, 학습 상태, 평가 기능은 이후 단계에서 구현합니다. 세부 순서는 [개발 로드맵](./docs/development-roadmap.md)을 기준으로 합니다.
 
-목표는 **"개발자를 가르치는 AI"** 입니다.
+## 기술 스택
 
----
-
-# 핵심 기능
-
-## 1. AI 개발 멘토
-
-개발 관련 질문에 답변합니다.
-
-예시
-
-```
-Hibernate가 뭐예요?
-```
-
-단순히 설명만 하지 않고
-
-- 현재 이해 수준
-- 선행 지식
-- 다음에 배워야 할 내용
-
-까지 안내합니다.
-
----
-
-## 2. 지식 수준 분석
-
-대화를 통해 기술별 이해도를 분석합니다.
-
-예시
-
-```
-Java            █████████░ 90%
-Spring Boot     ████████░░ 80%
-JPA             ██████░░░░ 60%
-Redis           ███░░░░░░░ 30%
-Docker          ██░░░░░░░░ 20%
-React           ████░░░░░░ 40%
-```
-
----
-
-## 3. 학습 로드맵 생성
-
-부족한 부분을 기반으로 다음 학습 순서를 생성합니다.
-
-예시
-
-```
-Java
- ↓
-Spring
- ↓
-JPA
- ↓
-Hibernate
- ↓
-QueryDSL
- ↓
-Redis
-```
-
----
-
-## 4. 오답 분석
-
-잘못 이해한 개념을 저장합니다.
-
-예시
-
-```
-❌ JPA = Hibernate
-
-→ JPA는 표준 명세
-
-→ Hibernate는 구현체
-```
-
----
-
-## 5. 면접 모드
-
-AI가 면접관이 되어 질문합니다.
-
-```
-Q.
-@Transactional은 왜 사용하는가?
-
-A.
-...
-
-AI 피드백
-```
-
----
-
-## 6. 프로젝트 리뷰
-
-GitHub Repository를 분석하여
-
-- 코드 품질
-- 아키텍처
-- 설계
-- 개선점
-
-을 제안합니다.
-
----
-
-# 앞으로 추가할 기능
-
-- [ ] GitHub 로그인
-- [ ] GitHub Repository 분석
-- [ ] AI 코드 리뷰
-- [ ] 알고리즘 문제 추천
-- [ ] 개발 일지 자동 생성
-- [ ] CS 면접
-- [ ] 프로젝트 기반 학습
-- [ ] 맞춤형 퀴즈
-- [ ] 학습 통계
-- [ ] AI 음성 튜터
-
----
-
-# 기술 스택
-
-## Backend
+### Backend
 
 - Java 21
-- Spring Boot
-- Spring Data JPA
+- Spring Boot 3.5.6
+- Gradle 8.14.4
+- Spring Web, Spring Data JPA, Validation
 - PostgreSQL
+- JUnit 5
 
-## Frontend
+### Frontend
 
-- React
+- React 19
 - TypeScript
 - Vite
+- React Router
+- Axios
 
-## AI
+### Infrastructure
 
-- OpenAI API
-- Embedding
-- RAG (예정)
+- Docker Compose
+- PostgreSQL 17
 
----
+## 프로젝트 구조
 
-# 비전
+```text
+DevMentor
+├─ backend
+│  ├─ gradle/wrapper
+│  ├─ src/main
+│  ├─ src/test
+│  ├─ build.gradle
+│  └─ settings.gradle
+├─ frontend
+│  ├─ src
+│  ├─ package.json
+│  └─ vite.config.ts
+├─ docs
+├─ .env.example
+├─ .gitignore
+├─ docker-compose.yml
+└─ README.md
+```
 
-대부분의 AI는 질문에 답합니다.
+## 실행 환경
 
-DevMentor는 질문에 답하는 것을 넘어,
+- Java 21
+- Node.js 20.19 이상 또는 22.12 이상
+- Docker Desktop
 
-> **개발자의 성장을 관리하는 AI**
+## 환경변수 설정
 
-를 목표로 합니다.
+PowerShell:
 
-사용자가 무엇을 배우면 좋을지 스스로 판단하고,
-학습 이력과 이해도를 기억하며,
-실무와 면접까지 함께 준비하는 AI 멘토를 만드는 것이 이 프로젝트의 목표입니다.
+```powershell
+Copy-Item .env.example .env
+```
+
+루트 `.env`는 Docker Compose가 직접 읽고, 백엔드와 프론트엔드도 각각 명시적으로 같은 파일을 불러옵니다. 기본값으로 실행할 때는 파일 내용을 수정하지 않아도 됩니다. 실제 API Key는 `.env`에만 작성하고 Git에 커밋하지 않습니다.
+
+주요 환경변수:
+
+| 변수 | 기본값 | 용도 |
+| --- | --- | --- |
+| `POSTGRES_DB` | `devmentor` | DB 이름 |
+| `POSTGRES_USER` | `devmentor` | DB 사용자 |
+| `POSTGRES_PASSWORD` | `devmentor` | DB 비밀번호 |
+| `POSTGRES_PORT` | `5432` | 호스트 DB 포트 |
+| `VITE_API_BASE_URL` | `http://localhost:8080/api` | 프론트엔드 API 주소 |
+| `FRONTEND_ORIGIN` | `http://localhost:5173` | 백엔드가 허용하는 프론트엔드 Origin |
+| `OPENAI_API_KEY` | 빈 값 | 4단계에서 사용 |
+| `OPENAI_MODEL` | 빈 값 | 4단계에서 사용 |
+
+## 실행 방법
+
+### 1. PostgreSQL
+
+저장소 루트에서 실행합니다.
+
+```powershell
+docker compose up -d postgres
+docker compose ps
+```
+
+`devmentor-postgres` 상태가 `healthy`이면 준비된 것입니다.
+
+종료:
+
+```powershell
+docker compose stop postgres
+```
+
+데이터까지 제거하는 `docker compose down -v`는 저장된 DB 데이터를 삭제하므로 의도한 경우에만 사용합니다.
+
+### 2. Backend
+
+```powershell
+cd backend
+.\gradlew.bat bootRun
+```
+
+상태 확인:
+
+```powershell
+Invoke-RestMethod http://localhost:8080/api/health
+```
+
+### 3. Frontend
+
+새 PowerShell에서 실행합니다.
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+브라우저에서 `http://localhost:5173`을 엽니다.
+
+Vite는 다른 서비스가 5173 포트를 사용 중이면 명확히 실패하도록 설정되어 있습니다. 다른 포트가 필요하면 프론트엔드 포트와 백엔드의 `FRONTEND_ORIGIN`을 같은 주소로 변경해야 합니다.
+
+## 테스트와 빌드
+
+Backend:
+
+```powershell
+cd backend
+.\gradlew.bat test
+```
+
+Frontend:
+
+```powershell
+cd frontend
+npm run build
+npm run lint
+```
+
+## API 문서
+
+- 현재 API: [docs/api-spec.md](./docs/api-spec.md)
+- 현재 구조: [docs/architecture.md](./docs/architecture.md)
+- 제품 요구사항: [docs/product-requirements.md](./docs/product-requirements.md)
+- 개발 진행 기록: [docs/progress.md](./docs/progress.md)
+
+## MVP 개발 순서
+
+1. ~~실행 가능한 프로젝트 골격~~
+2. 핵심 데이터 모델
+3. 사용자와 대화 기본 기능
+4. AI 멘토 연동
+5. 학습 상태 분석
+6. 대시보드와 학습 현황
+7. 평가와 복습
+8. 통합 검증과 문서 완성
+
+면접 모드, GitHub Repository 분석, RAG, 음성 기능 등은 MVP 이후 백로그입니다.

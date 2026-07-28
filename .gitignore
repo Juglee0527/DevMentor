@@ -1,0 +1,30 @@
+# Environment and local configuration
+.env
+application-local.yml
+backend/src/main/resources/application-local.yml
+
+# Java / Gradle
+.gradle/
+backend/.gradle/
+backend/build/
+**/out/
+*.class
+
+# Node / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
