@@ -12,5 +12,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     List<ChatRoom> findAllByUserIdOrderByUpdatedAtDesc(Long userId);
 
+    List<ChatRoom> findTop5ByUserIdOrderByUpdatedAtDesc(Long userId);
+
     Optional<ChatRoom> findByIdAndUserId(Long id, Long userId);
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { createChatRoom, deleteChatRoom, getChatRooms, getMessages, sendMessage } from '../api/chat'
 import { getUser } from '../api/users'
 import { getApiErrorMessage } from '../api/client'
@@ -137,6 +138,10 @@ export function ChatPage() {
       </section>
 
       <aside className="profile-panel">
+        <nav className="profile-navigation" aria-label="학습 메뉴">
+          <Link to="/dashboard">대시보드</Link>
+          <Link to="/learning">학습 현황</Link>
+        </nav>
         <p className="section-label">LEARNER</p>
         <h2>{user?.nickname ?? '사용자'}</h2>
         <dl>

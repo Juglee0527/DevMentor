@@ -22,4 +22,12 @@ public interface ConceptRepository extends JpaRepository<Concept, Long> {
             where skill.code in :skillCodes
             """)
     List<Concept> findAllBySkillCodeIn(@Param("skillCodes") Set<String> skillCodes);
+
+    @Query("""
+            select concept
+            from Concept concept
+            join fetch concept.skill skill
+            order by skill.displayOrder, concept.displayOrder
+            """)
+    List<Concept> findAllWithSkillOrderByDisplayOrder();
 }

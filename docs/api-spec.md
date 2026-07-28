@@ -178,7 +178,47 @@ GET /api/learning/recommendations?userId={userId}
 
 점수는 항상 0~100으로 제한합니다. 평가 정답·오답 규칙은 7단계에서 평가 저장 흐름에 연결합니다.
 
-## 8. 공통 오류
+## 8. 대시보드 API
+
+```http
+GET /api/dashboard?userId={userId}
+```
+
+응답 데이터는 다음 정보를 포함합니다.
+
+- 사용자 닉네임, 경력, 역할, 학습 목표
+- 학습을 시작한 개념 기준 전체 평균 점수
+- 전체·학습한·복습 필요 개념 수
+- 9개 기술의 평균 점수와 학습 개념 수
+- 점수 80 미만인 보완 개념 최대 5개
+- 최근 대화방 최대 5개
+
+학습 이력이 없으면 전체 점수와 개수가 0이고, 기술별 진행률과 보완 개념은 정상적인 빈 상태로 반환됩니다.
+
+## 9. 학습 현황 API
+
+```http
+GET /api/learning/status?userId={userId}
+```
+
+기술 표시 순서와 개념 표시 순서에 따라 9개 기술·19개 개념을 반환합니다. 저장된 사용자 상태가 없는 개념은 다음 기본값을 사용합니다.
+
+```json
+{
+  "conceptCode": "ENTITY",
+  "conceptName": "Entity",
+  "difficulty": "BEGINNER",
+  "understandingScore": 0,
+  "learningStatus": "NOT_STARTED",
+  "assessmentReason": null,
+  "lastStudiedAt": null,
+  "nextReviewAt": null
+}
+```
+
+대시보드와 학습 현황은 기술·개념 fetch 조회와 사용자 상태 fetch 조회를 사용하며, 사용자별 데이터 크기가 증가해도 개념마다 추가 SQL을 실행하지 않습니다.
+
+## 10. 공통 오류
 
 | HTTP 상태 | 조건 | 메시지 원칙 |
 | --- | --- | --- |
@@ -187,6 +227,6 @@ GET /api/learning/recommendations?userId={userId}
 | `502 Bad Gateway` | 외부 AI 연결·응답 실패 | 재시도를 안내하는 고정 메시지 |
 | `500 Internal Server Error` | 처리하지 못한 내부 오류 | 고정된 일반 오류 메시지 |
 
-## 9. 이후 추가 예정
+## 11. 이후 추가 예정
 
-대시보드, 학습 현황, 평가 API는 아직 구현되지 않았습니다. 각 개발 단계에서 실제 요청·응답 DTO와 함께 이 문서를 갱신합니다.
+평가와 복습 API는 아직 구현되지 않았습니다. 7단계에서 실제 요청·응답 DTO와 함께 이 문서를 갱신합니다.

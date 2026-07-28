@@ -52,6 +52,7 @@ export function HomePage() {
   }
 
   const savedRoomId = localStorage.getItem('devmentorLastRoomId')
+  const savedUserId = localStorage.getItem('devmentorUserId')
 
   return (
     <main className="landing">
@@ -76,6 +77,11 @@ export function HomePage() {
           {savedRoomId && (
             <button className="secondary-button" type="button" onClick={() => navigate(`/chat/${savedRoomId}`)}>
               이전 학습 계속하기
+            </button>
+          )}
+          {savedUserId && (
+            <button className="secondary-button" type="button" onClick={() => navigate('/dashboard')}>
+              학습 대시보드
             </button>
           )}
         </div>

@@ -49,3 +49,66 @@ export interface ChatExchange {
   analysis: AiTutorAnalysis
   structured: boolean
 }
+
+export type LearningState =
+  | 'NOT_STARTED'
+  | 'LEARNING'
+  | 'UNDERSTOOD'
+  | 'NEEDS_REVIEW'
+
+export interface SkillProgress {
+  skillCode: string
+  skillName: string
+  averageScore: number
+  startedConceptCount: number
+  totalConceptCount: number
+}
+
+export interface WeakConcept {
+  skillCode: string
+  skillName: string
+  conceptCode: string
+  conceptName: string
+  understandingScore: number
+  learningStatus: LearningState
+  reason: string | null
+}
+
+export interface Dashboard {
+  user: {
+    id: number
+    nickname: string
+    careerYears: number
+    currentRole: string
+    learningGoal: string
+  }
+  overallUnderstandingScore: number
+  totalConceptCount: number
+  startedConceptCount: number
+  reviewTargetCount: number
+  skillProgress: SkillProgress[]
+  weakConcepts: WeakConcept[]
+  recentChats: ChatRoom[]
+}
+
+export interface ConceptLearningStatus {
+  conceptCode: string
+  conceptName: string
+  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'
+  understandingScore: number
+  learningStatus: LearningState
+  assessmentReason: string | null
+  lastStudiedAt: string | null
+  nextReviewAt: string | null
+}
+
+export interface SkillLearningStatus {
+  skillCode: string
+  skillName: string
+  averageScore: number
+  concepts: ConceptLearningStatus[]
+}
+
+export interface LearningStatusOverview {
+  skills: SkillLearningStatus[]
+}
