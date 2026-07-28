@@ -2,9 +2,9 @@
 
 ## 1. 현재 상태
 
-- 현재 단계: `1단계 - 실행 가능한 프로젝트 골격`
+- 현재 단계: `2단계 - 핵심 데이터 모델`
 - 상태: `완료`
-- 다음 작업: `2.1 사용자·대화 Entity`
+- 다음 작업: `3.1 사용자 API와 시작 화면`
 - 마지막 갱신일: `2026-07-28`
 
 ## 2. 단계별 진행률
@@ -13,7 +13,7 @@
 | --- | --- | --- |
 | 0. 요구사항과 작업 체계 | 완료 | 제품 요구사항, 개발 로드맵, 진행 기록 |
 | 1. 프로젝트 초기화 | 완료 | 구조, PostgreSQL, Spring Boot, React, 공통 API |
-| 2. 핵심 데이터 모델 | 대기 | - |
+| 2. 핵심 데이터 모델 | 완료 | Entity, Repository, 초기 기술·개념, Testcontainers |
 | 3. 사용자와 대화 기본 기능 | 대기 | - |
 | 4. AI 멘토 연동 | 대기 | - |
 | 5. 학습 상태 분석 | 대기 | - |
@@ -22,6 +22,37 @@
 | 8. 통합 검증과 문서 | 대기 | - |
 
 ## 3. 변경 기록
+
+### 2026-07-28 - 2단계 핵심 데이터 모델
+
+작업 범위:
+
+- User, ChatRoom, ChatMessage, Skill, Concept, UserConceptStatus, Assessment 구현
+- 메시지 역할, 개념 난이도, 학습 상태 enum 구현
+- 사용자 관심 기술 연결과 주요 unique·index·점수 check constraint 구성
+- 7개 Repository와 사용자 소유·정렬·복습 조회 메서드 구현
+- 기술 9개와 핵심 개념 19개 누락 보완 초기화 구현
+- PostgreSQL Testcontainers 기반 context·Repository 통합 테스트 작성
+
+주요 결정:
+
+- 로컬 스키마는 MVP 기간에 `ddl-auto=update`, 테스트는 `create-drop` 사용
+- 운영 배포 전 migration 도구 도입 필요성을 `database-design.md`에 명시
+- PostgreSQL 예약어 `CURRENT_ROLE`과 충돌하지 않도록 컬럼명을 `job_role`로 지정
+- 초기 데이터는 전체 존재 여부가 아니라 code별 누락 항목만 추가
+
+검증:
+
+- `backend\gradlew.bat test --no-daemon`: 성공, 6개 테스트 통과
+- PostgreSQL 17 Testcontainers: 스키마·관계·저장·조회 성공
+- 초기 기술 9개, 개념 19개 검증 성공
+- `frontend\npm run build`: 성공
+- `frontend\npm run lint`: 성공
+
+남은 위험 및 다음 작업:
+
+- 운영 배포 전 Flyway 또는 Liquibase migration 전환 필요
+- 3단계에서 DTO Validation과 사용자·대화 소유권 검증을 서비스 계층에 구현
 
 ### 2026-07-28 - 1단계 실행 가능한 프로젝트 골격
 

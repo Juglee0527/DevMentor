@@ -1,9 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:${TEST_POSTGRES_PORT:5432}/${POSTGRES_DB:devmentor}
-    username: ${POSTGRES_USER:devmentor}
-    password: ${POSTGRES_PASSWORD:devmentor}
   jpa:
     hibernate:
-      ddl-auto: validate
-
+      ddl-auto: create-drop
