@@ -6,7 +6,7 @@ DevMentor는 단발성 개발 질문 챗봇이 아니라 대화와 평가 결과
 
 ## 현재 구현 상태
 
-현재 **7단계: 평가와 복습**까지 구현되었습니다.
+현재 **8단계: 통합 검증과 문서 완성**까지 완료되어 MVP 기능과 검증 문서가 준비되었습니다.
 
 | 영역 | 구현 상태 |
 | --- | --- |
@@ -23,7 +23,7 @@ DevMentor는 단발성 개발 질문 챗봇이 아니라 대화와 평가 결과
 | 학습 화면 | 전체·기술별 집계 대시보드, 기술·개념별 학습 현황 |
 | 평가·복습 | 확인 질문 목록, AI 평가, 피드백·모범 답안, 평가 이력과 상태 반영 |
 
-MVP 기능 구현은 완료되었으며 8단계에서 통합 검증과 문서를 마무리합니다. 세부 순서는 [개발 로드맵](./docs/development-roadmap.md)을 기준으로 합니다.
+MVP 기능 구현과 Fake AI 기반 통합 검증을 완료했습니다. 실제 OpenAI live 검증과 운영 전 조치는 [MVP 검증 기록](./docs/verification.md)을 확인해 주세요.
 
 ## 기술 스택
 
@@ -174,6 +174,7 @@ npm run lint
 - 현재 구조: [docs/architecture.md](./docs/architecture.md)
 - 제품 요구사항: [docs/product-requirements.md](./docs/product-requirements.md)
 - 개발 진행 기록: [docs/progress.md](./docs/progress.md)
+- MVP 검증 결과: [docs/verification.md](./docs/verification.md)
 
 ## MVP 개발 순서
 
@@ -184,6 +185,6 @@ npm run lint
 5. ~~학습 상태 분석~~
 6. ~~대시보드와 학습 현황~~
 7. ~~평가와 복습~~
-8. 통합 검증과 문서 완성
+8. ~~통합 검증과 문서 완성~~
 
 면접 모드, GitHub Repository 분석, RAG, 음성 기능 등은 MVP 이후 백로그입니다.
