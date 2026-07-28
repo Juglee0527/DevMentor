@@ -20,17 +20,20 @@ public class AiChatService {
     private final AiContextService contextService;
     private final AiTutorClient aiTutorClient;
     private final ChatService chatService;
+    private final AiResultPersistenceService resultPersistenceService;
     private final ObjectMapper objectMapper;
 
     public AiChatService(
             AiContextService contextService,
             AiTutorClient aiTutorClient,
             ChatService chatService,
+            AiResultPersistenceService resultPersistenceService,
             ObjectMapper objectMapper
     ) {
         this.contextService = contextService;
         this.aiTutorClient = aiTutorClient;
         this.chatService = chatService;
+        this.resultPersistenceService = resultPersistenceService;
         this.objectMapper = objectMapper;
     }
 
@@ -48,10 +51,10 @@ public class AiChatService {
             log.warn("AI structured response validation failed; using text fallback");
         }
 
-        MessageResponse assistantMessage = chatService.saveAssistantMessage(
+        MessageResponse assistantMessage = resultPersistenceService.save(
                 roomId,
                 userId,
-                result.response().answer(),
+                result.response(),
                 serializeAnalysis(result)
         );
         return new ChatExchangeResponse(

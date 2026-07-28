@@ -2,6 +2,7 @@ package com.devmentor.chat;
 
 import com.devmentor.user.entity.User;
 import com.devmentor.user.repository.UserRepository;
+import com.devmentor.learning.repository.UserConceptStatusRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @Testcontainers
@@ -31,6 +33,7 @@ class ChatApiIntegrationTest {
 
     @Autowired MockMvc mockMvc;
     @Autowired UserRepository userRepository;
+    @Autowired UserConceptStatusRepository statusRepository;
 
     @Test
     void createsUserRoomAndMessageAndProtectsOwnership() throws Exception {
@@ -80,6 +83,19 @@ class ChatApiIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].content").value("Hibernate가 뭐예요?"))
                 .andExpect(jsonPath("$.data[1].role").value("ASSISTANT"));
+
+        assertThat(statusRepository.findAllWithConceptByUserId(userId))
+                .singleElement()
+                .satisfies(status -> {
+                    assertThat(status.getConcept().getCode()).isEqualTo("JPA_HIBERNATE_RELATION");
+                    assertThat(status.getUnderstandingScore()).isEqualTo(10);
+                });
+
+        mockMvc.perform(get("/api/learning/recommendations")
+                        .queryParam("userId", String.valueOf(userId)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].conceptCode").value("JPA_HIBERNATE_RELATION"))
+                .andExpect(jsonPath("$.data[0].understandingScore").value(10));
 
         mockMvc.perform(get("/api/chat-rooms/{roomId}", roomId)
                         .queryParam("userId", String.valueOf(otherUser.getId())))

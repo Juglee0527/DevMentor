@@ -87,4 +87,18 @@ public class UserConceptStatus extends BaseEntity {
     public LocalDateTime getNextReviewAt() {
         return nextReviewAt;
     }
+
+    public void updateProgress(
+            int understandingScore,
+            LearningStatus learningStatus,
+            String assessmentReason,
+            LocalDateTime lastStudiedAt,
+            LocalDateTime nextReviewAt
+    ) {
+        this.understandingScore = understandingScore;
+        this.learningStatus = learningStatus;
+        this.assessmentReason = assessmentReason;
+        this.lastStudiedAt = lastStudiedAt;
+        this.nextReviewAt = nextReviewAt;
+    }
 }
