@@ -18,12 +18,12 @@ DevMentor는 단발성 개발 질문 챗봇이 아니라 대화와 평가 결과
 | 초기 데이터 | 기술 9개, 핵심 개념 19개 |
 | 사용자 기능 | 프로필 생성·조회·수정과 관심 기술 |
 | 대화 기능 | 대화방 생성·조회·삭제, 사용자 메시지 저장·조회 |
-| AI 멘토 | Fake/OpenAI Client 분리, 구조화 답변, 텍스트 fallback, 대화 화면 연동 |
+| AI 멘토 | Fake/OpenAI Client 분리, 구조화 답변, 텍스트 fallback, 대화 화면 연동. 로컬 오픈 모델은 계획 수립 완료·미구현 |
 | 학습 분석 | 감지 개념·지식 공백 상태 반영, 점수·복습일 규칙, 추천 개념 API |
 | 학습 화면 | 전체·기술별 집계 대시보드, 기술·개념별 학습 현황 |
 | 평가·복습 | 확인 질문 목록, AI 평가, 피드백·모범 답안, 평가 이력과 상태 반영 |
 
-MVP 기능 구현과 Fake AI 기반 통합 검증을 완료했습니다. 실제 OpenAI live 검증과 운영 전 조치는 [MVP 검증 기록](./docs/verification.md)을 확인해 주세요.
+MVP 기능 구현과 Fake AI 기반 통합 검증을 완료했습니다. 실제 OpenAI live 검증과 운영 전 조치는 [MVP 검증 기록](./docs/verification.md)을 확인해 주세요. API Key 없이 실행하는 로컬 오픈 모델 연동은 [로컬 오픈 모델 개발 계획](./docs/open-model-development-plan.md)의 Task 9부터 진행합니다.
 
 ## 기술 스택
 
@@ -175,6 +175,7 @@ npm run lint
 - 제품 요구사항: [docs/product-requirements.md](./docs/product-requirements.md)
 - 개발 진행 기록: [docs/progress.md](./docs/progress.md)
 - MVP 검증 결과: [docs/verification.md](./docs/verification.md)
+- 로컬 오픈 모델 개발 계획: [docs/open-model-development-plan.md](./docs/open-model-development-plan.md)
 
 ## MVP 개발 순서
 
@@ -188,3 +189,14 @@ npm run lint
 8. ~~통합 검증과 문서 완성~~
 
 면접 모드, GitHub Repository 분석, RAG, 음성 기능 등은 MVP 이후 백로그입니다.
+
+## MVP 이후 AI 개발 순서
+
+1. 하드웨어 확인과 DevMentor 평가 기준 수립
+2. Ollama 기반 로컬 오픈 모델 연결
+3. 모델별 프롬프트·응답 스키마 공통화
+4. DevMentor 평가셋으로 모델 비교와 기본 모델 확정
+5. 지식 부족이 확인된 경우에만 RAG 도입
+6. 검수 데이터와 개선 필요가 충분한 경우에만 LoRA 파인튜닝
+
+상세 범위, 예외 처리, 완료 조건과 중단 기준은 [로컬 오픈 모델 개발 계획](./docs/open-model-development-plan.md)을 따릅니다.

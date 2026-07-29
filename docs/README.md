@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | [product-requirements.md](./product-requirements.md) | 제품 목표, MVP 범위, 완료 조건 정의 | 요구사항이 변경될 때 |
 | [development-roadmap.md](./development-roadmap.md) | Codex에 하나씩 지시할 개발 작업 목차 | 작업 범위나 순서가 변경될 때 |
+| [open-model-development-plan.md](./open-model-development-plan.md) | 로컬 오픈 모델 연동, 평가, RAG, 선택적 파인튜닝 계획 | AI 실행 구조나 단계별 기준이 변경될 때 |
 | [progress.md](./progress.md) | 완료 내역, 검증 결과, 다음 작업 기록 | 각 개발 작업이 끝날 때 |
 | `architecture.md` | 시스템 구조와 주요 데이터 흐름 | 1단계에서 생성 |
 | `api-spec.md` | API 계약과 요청·응답 예시 | API 구현 시 생성·갱신 |
@@ -24,6 +25,7 @@
 4. 작업 종료 후 [progress.md](./progress.md)에 변경 파일, 검증 결과, 남은 위험을 기록합니다.
 5. 구현되지 않은 기능은 완료로 표시하지 않습니다.
 6. MVP 제외 기능은 현재 구조에 미리 구현하지 않습니다.
+7. 로컬 오픈 모델 작업은 [open-model-development-plan.md](./open-model-development-plan.md)의 착수 조건과 중단 기준을 따릅니다.
 
 ## Codex 작업 요청 예시
 
