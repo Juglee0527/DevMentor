@@ -149,6 +149,7 @@ app:
       base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
       model: ${OLLAMA_MODEL:}
       timeout-seconds: ${OLLAMA_TIMEOUT_SECONDS:120}
+      max-output-tokens: ${OLLAMA_MAX_OUTPUT_TOKENS:1024}
 ```
 
 예외 처리:

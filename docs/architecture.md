@@ -71,11 +71,17 @@ PostgreSQL :5432
 ## 4. AI 설정 경계
 
 - `AI_CLIENT_MODE=fake`가 기본이며 API Key 없이 로컬·테스트에서 동작합니다.
+- `AI_CLIENT_MODE=ollama`는 로컬 Ollama의 `/api/chat`을 호출하고 API Key를 사용하지 않습니다.
 - 실제 호출은 `AI_CLIENT_MODE=openai`와 비어 있지 않은 `OPENAI_API_KEY`, `OPENAI_MODEL`이 모두 필요합니다.
 - 모델명과 API Key는 코드에 고정하지 않습니다.
 - `OPENAI_TIMEOUT_SECONDS`로 전체 요청 제한 시간을 설정합니다.
+- `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `OLLAMA_TIMEOUT_SECONDS`, `OLLAMA_MAX_OUTPUT_TOKENS`로 로컬 실행기를 설정합니다.
+- 멘토 답변은 숨겨진 장시간 추론을 피하기 위해 `think=false`, 결정적 구조화 출력을 위해 `temperature=0`을 사용합니다.
 - OpenAI 응답 본문에서 `output_text`를 찾아 구조화 DTO로 변환합니다.
+- Ollama 응답 본문의 `message.content`를 같은 DTO로 검증하고, tutor 일반 텍스트는 기존 fallback 정책을 적용합니다.
+- OpenAI Responses API와 Ollama Chat API의 envelope가 다르므로 전송·파서 구현은 분리합니다.
+- 선택한 모드에서 정확히 하나의 `AiTutorClient`만 조건부 Bean으로 활성화됩니다.
 
 ## 5. 다음 변경 예정
 
-8단계에서 Fake AI 기반 전체 E2E, PostgreSQL 저장 결과, 모바일 기본 레이아웃, 실행 문서의 재현성을 최종 확인합니다.
+Task 11에서 OpenAI와 Ollama 구현체가 중복 보유한 시스템 지시문과 JSON Schema 생성 책임을 공통 컴포넌트로 이동합니다.

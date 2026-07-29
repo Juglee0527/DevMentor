@@ -2,9 +2,9 @@
 
 ## 1. 현재 상태
 
-- 현재 단계: `9단계 - AI 평가 기준 수립`
+- 현재 단계: `10단계 - Ollama 로컬 모델 연결`
 - 상태: `완료`
-- 다음 작업: `10단계 - Ollama 로컬 모델 연결`
+- 다음 작업: `11단계 - 프롬프트와 응답 스키마 공통화`
 - 마지막 갱신일: `2026-07-29`
 
 ## 2. 단계별 진행률
@@ -21,13 +21,50 @@
 | 7. 평가와 복습 | 완료 | 평가 AI 계약, 평가 저장·상태 반영, 복습 화면 |
 | 8. 통합 검증과 문서 | 완료 | 전체 테스트, E2E·DB 증거, 실행·설계 문서 정합성 |
 | 9. AI 평가 기준 수립 | 완료 | 장비 확인, 36개 고정 평가셋, 품질·성능 게이트 |
-| 10. 로컬 오픈 모델 연결 | 대기 | Ollama Client, 구조화 대화·평가, 실패 처리 |
+| 10. 로컬 오픈 모델 연결 | 완료 | Ollama Client, 구조화 대화·평가, 실패 처리 |
 | 11. AI 계약 공통화 | 대기 | 공통 프롬프트와 JSON Schema |
 | 12. 모델 비교와 확정 | 대기 | 실제 모델 평가와 기본 모델 선택 |
 | 13. RAG | 보류 | 지식 부족 확인 시 근거 검색 |
 | 14. 피드백·LoRA | 보류 | 검수 데이터와 개선 필요 확인 |
 
 ## 3. 변경 기록
+
+### 2026-07-29 - 10단계 Ollama 로컬 모델 연결
+
+작업 범위:
+
+- Windows Ollama `0.32.5` 설치와 로컬 `/api/chat` 연결
+- `OllamaAiTutorClient`, 전용 JDK transport, 응답 parser 추가
+- tutor와 assessment JSON Schema 요청·응답 변환
+- `fake`, `ollama`, `openai` 조건부 Client 분리
+- base URL, 모델, timeout, 최대 출력 토큰 환경변수화
+- thinking 비활성화와 결정적 출력을 위한 temperature 0 적용
+- 서버 실패, 빈 응답, 잘못된 JSON, DTO 검증 실패 처리
+- 로컬 실행 절차와 현재 아키텍처 문서화
+
+주요 결정:
+
+- OpenAI `/responses` envelope와 Ollama `/api/chat` envelope를 억지로 통합하지 않고 전송·파서를 분리
+- tutor의 일반 텍스트 fallback은 유지하고 assessment 파싱 실패는 오류로 처리
+- 모델 서버 응답 본문과 내부 주소를 사용자 오류 메시지에 노출하지 않음
+- 실제 모델 품질과 기본 모델 확정은 연결 완료와 구분해 Task 12에서 판정
+
+검증:
+
+- `qwen3.5:4b` tutor: `think=false`, 출력 제한 적용 시 유효 JSON Schema와 허용 코드 반환
+- `qwen3.5:4b` assessment: 유효 JSON Schema 반환
+- Ollama 실행 장치: CPU/GPU 혼합 추론 확인
+- transport stub 기반 tutor·assessment·fallback·외부 실패·필수 설정 테스트 작성
+- Gradle 실행은 Spring Boot plugin artifact가 오프라인 캐시에 없어 환경 제약으로 중단
+- 생성자 호출, import, 조건부 Bean, 설정 키, DTO 제약 정적 검토
+- `git diff --check` 성공
+
+남은 위험 및 다음 작업:
+
+- qwen3.5 4B의 한국어 준수와 평가 정확도가 품질 기준에 미달
+- OpenAI/Ollama에 시스템 지시문과 JSON Schema 중복 존재
+- Task 11에서 프롬프트·스키마를 공통화하고 허용 개념 목록을 명시적으로 제공
+- Task 12에서 더 작은 모델을 포함한 실제 평가로 기본 모델 확정
 
 ### 2026-07-29 - 9단계 AI 평가 기준 수립
 

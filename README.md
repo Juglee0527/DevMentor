@@ -96,12 +96,35 @@ Copy-Item .env.example .env
 | `POSTGRES_PORT` | `5432` | 호스트 DB 포트 |
 | `VITE_API_BASE_URL` | `http://localhost:8080/api` | 프론트엔드 API 주소 |
 | `FRONTEND_ORIGIN` | `http://localhost:5173` | 백엔드가 허용하는 프론트엔드 Origin |
-| `AI_CLIENT_MODE` | `fake` | `fake` 또는 `openai` AI 구현 선택 |
+| `AI_CLIENT_MODE` | `fake` | `fake`, `ollama`, `openai` AI 구현 선택 |
 | `OPENAI_API_KEY` | 빈 값 | OpenAI 모드 인증 Key |
 | `OPENAI_MODEL` | 빈 값 | OpenAI 모드에서 사용할 모델 |
 | `OPENAI_TIMEOUT_SECONDS` | `30` | OpenAI 응답 제한 시간 |
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama API 주소 |
+| `OLLAMA_MODEL` | `qwen3.5:4b` | Ollama에서 실행할 로컬 모델 후보 |
+| `OLLAMA_TIMEOUT_SECONDS` | `120` | 로컬 모델 응답 제한 시간 |
+| `OLLAMA_MAX_OUTPUT_TOKENS` | `1024` | 로컬 모델의 최대 출력 토큰 |
 
 기본 `fake` 모드는 API Key 없이 결정적인 멘토 답변을 반환하므로 로컬 개발과 테스트에 사용합니다. 실제 OpenAI API를 사용하려면 `.env`에서 `AI_CLIENT_MODE=openai`, `OPENAI_API_KEY`, `OPENAI_MODEL`을 모두 설정합니다.
+
+로컬 오픈 모델을 사용하려면 먼저 [Ollama for Windows](https://docs.ollama.com/windows)를 설치하고 모델을 준비합니다.
+
+```powershell
+ollama pull qwen3.5:4b
+ollama list
+```
+
+그다음 `.env`를 다음과 같이 변경합니다.
+
+```dotenv
+AI_CLIENT_MODE=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen3.5:4b
+OLLAMA_TIMEOUT_SECONDS=120
+OLLAMA_MAX_OUTPUT_TOKENS=1024
+```
+
+Ollama가 실행되지 않았거나 지정 모델이 설치되지 않으면 백엔드는 안전한 `502` 응답을 반환합니다. 실제 모델 호출은 장비 성능에 따라 오래 걸릴 수 있으므로 기본 자동 테스트와 CI는 계속 `fake` 모드를 사용합니다.
 
 ## 실행 방법
 

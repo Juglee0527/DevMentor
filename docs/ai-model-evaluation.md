@@ -28,10 +28,11 @@ Windows의 `Win32_VideoController.AdapterRAM` 값은 일부 장치에서 실제 
 
 | 후보 | 목적 | 장비 적합성 가정 | 상태 |
 | --- | --- | --- | --- |
-| `qwen3:4b-instruct` Q4_K_M | 기본 후보 | 모델 약 2.5GB로 4GB급 GPU/16GB RAM에서 우선 검증 | 대기 |
-| Qwen3 8B급 instruct Q4 | 품질 비교 | GPU 완전 적재는 어려울 수 있어 CPU 또는 부분 offload 예상 | 대기 |
+| `qwen3:4b-instruct` Q4_K_M | 초기 연결 후보 | 구조화 제약·한국어·속도 기준 미달 | 탈락 후보 |
+| `qwen3.5:4b` | Task 10 연결 후보 | 구조화 응답 성공, 한국어·정오답 품질 기준 미달 | Task 12 평가 대기 |
+| 2B~3B급 Apache 2.0 instruction 모델 | 속도 비교 | 현재 장비에서 4B보다 빠른 후보 필요 | 대기 |
 
-첫 연결은 `qwen3:4b-instruct`로 진행합니다. 이는 운영 모델 확정이 아니라 현재 장비에서 평가 파이프라인을 만드는 출발점입니다.
+첫 연결은 `qwen3:4b-instruct`로 시작했으나 실제 결과를 근거로 `qwen3.5:4b`까지 비교했습니다. Task 10에서는 Ollama 연결과 구조화 계약만 검증했으며 운영 기본 모델은 Task 12에서 확정합니다.
 
 ## 4. 평가 데이터
 
@@ -114,6 +115,17 @@ Windows의 `Win32_VideoController.AdapterRAM` 값은 일부 장치에서 실제 
 | 모델 | 양자화 | 실행 장치 | 구조화 성공률 | 자동 점수 | 수동 점수 | tutor P95 | assessment P95 | 최대 RAM | 판정 |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | 미실행 | - | - | - | - | - | - | - | - | 대기 |
+
+### Task 10 예비 실행
+
+| 모델 | 설정 | 결과 |
+| --- | --- | --- |
+| `qwen3:4b-instruct` | 기본 thinking, 구조화 tutor | 110.3초, 러시아어, 미등록 코드와 `confidence=-1` 생성 |
+| `qwen3.5:4b` | 기본 thinking, 구조화 tutor | 180초 timeout |
+| `qwen3.5:4b` | `think=false`, `num_predict=512` | 78.8초, 유효 JSON·허용 코드 준수, 한국어 지시 미준수 |
+| `qwen3.5:4b` | `think=false`, `num_predict=384`, assessment | 25.2초, 유효 JSON, 정답을 오답으로 판정하고 한국어 지시 미준수 |
+
+Ollama `ps`에서 `qwen3.5:4b`는 약 3.8GB, CPU 41% / GPU 59%로 표시되었습니다. 이 결과는 연결 검증이며 36개 전체 평가 결과가 아닙니다.
 
 각 실행 결과에는 다음 정보를 함께 기록합니다.
 
