@@ -2,6 +2,7 @@ package com.devmentor.ai.service;
 
 import com.devmentor.ai.dto.AiTutorRequest;
 import com.devmentor.chat.entity.ChatMessage;
+import com.devmentor.chat.entity.MessageRole;
 import com.devmentor.chat.repository.ChatMessageRepository;
 import com.devmentor.chat.repository.ChatRoomRepository;
 import com.devmentor.common.exception.ResourceNotFoundException;
@@ -10,6 +11,9 @@ import com.devmentor.knowledge.KnowledgeRetrievalService;
 import com.devmentor.skill.repository.ConceptRepository;
 import com.devmentor.user.entity.User;
 import com.devmentor.user.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +33,7 @@ public class AiContextService {
     private final UserConceptStatusRepository statusRepository;
     private final ConceptRepository conceptRepository;
     private final KnowledgeRetrievalService knowledgeRetrievalService;
+    private final ObjectMapper objectMapper;
 
     public AiContextService(
             UserService userService,
@@ -36,7 +41,8 @@ public class AiContextService {
             ChatMessageRepository messageRepository,
             UserConceptStatusRepository statusRepository,
             ConceptRepository conceptRepository,
-            KnowledgeRetrievalService knowledgeRetrievalService
+            KnowledgeRetrievalService knowledgeRetrievalService,
+            ObjectMapper objectMapper
     ) {
         this.userService = userService;
         this.roomRepository = roomRepository;
@@ -44,6 +50,7 @@ public class AiContextService {
         this.statusRepository = statusRepository;
         this.conceptRepository = conceptRepository;
         this.knowledgeRetrievalService = knowledgeRetrievalService;
+        this.objectMapper = objectMapper;
     }
 
     public AiTutorRequest build(Long roomId, Long userId, String currentQuestion) {
@@ -72,7 +79,7 @@ public class AiContextService {
                         .limit(RECENT_MESSAGE_LIMIT)
                         .map(message -> new AiTutorRequest.ConversationMessage(
                                 message.getRole().name(),
-                                message.getContent()
+                                conversationContent(message)
                         ))
                         .toList(),
                 statusRepository.findAllByUserId(userId).stream()
@@ -101,5 +108,23 @@ public class AiContextService {
                         ))
                         .toList()
         );
+    }
+
+    private String conversationContent(ChatMessage message) {
+        if (message.getRole() != MessageRole.ASSISTANT) {
+            return message.getContent();
+        }
+        try {
+            JsonNode parsedContent = objectMapper.readTree(message.getContent());
+            if (parsedContent != null) {
+                String answer = parsedContent.path("answer").asText();
+                if (!answer.isBlank()) {
+                    return answer;
+                }
+            }
+        } catch (JsonProcessingException ignored) {
+            // 일반 텍스트 답변은 원문 그대로 대화 문맥에 사용합니다.
+        }
+        return message.getContent();
     }
 }

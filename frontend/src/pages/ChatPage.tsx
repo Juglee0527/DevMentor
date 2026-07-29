@@ -39,6 +39,7 @@ export function ChatPage() {
   const [newTitle, setNewTitle] = useState('')
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
+  const [pendingQuestion, setPendingQuestion] = useState('')
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [latestAnalysis, setLatestAnalysis] = useState<AiTutorAnalysis | null>(null)
   const [latestSources, setLatestSources] = useState<KnowledgeSource[]>([])
@@ -81,7 +82,10 @@ export function ChatPage() {
   async function handleSend(event: FormEvent) {
     event.preventDefault()
     if (sending || !content.trim()) return
+    const question = content.trim()
     setElapsedSeconds(0)
+    setPendingQuestion(question)
+    setContent('')
     setSending(true)
     setError('')
     setLatestAnalysis(null)
@@ -92,7 +96,7 @@ export function ChatPage() {
     setTrainingConsent(false)
     setFeedbackStatus('')
     try {
-      const exchange = await sendMessage(roomId, userId, content)
+      const exchange = await sendMessage(roomId, userId, question)
       setMessages((current) => [
         ...current,
         exchange.userMessage,
@@ -101,10 +105,11 @@ export function ChatPage() {
       setLatestAnalysis(exchange.analysis)
       setLatestSources(exchange.sources)
       setLatestAssistantMessageId(exchange.assistantMessage.id)
-      setContent('')
     } catch (requestError) {
       setError(getApiErrorMessage(requestError))
+      setContent((current) => current || question)
     } finally {
+      setPendingQuestion('')
       setSending(false)
     }
   }
@@ -185,13 +190,19 @@ export function ChatPage() {
           <button className="delete-room" type="button" onClick={handleDeleteRoom}>대화방 삭제</button>
         </header>
         <div className="message-list" aria-live="polite">
-          {messages.length === 0 && !sending && <div className="empty-message"><strong>첫 질문을 남겨보세요.</strong><span>학습 목표와 최근 대화를 바탕으로 AI 멘토가 맞춤 답변을 제공합니다.</span></div>}
+          {messages.length === 0 && !pendingQuestion && <div className="empty-message"><strong>첫 질문을 남겨보세요.</strong><span>학습 목표와 최근 대화를 바탕으로 AI 멘토가 맞춤 답변을 제공합니다.</span></div>}
           {messages.map((message) => (
             <article className={`message ${message.role.toLowerCase()}`} key={message.id}>
               <span>{message.role === 'USER' ? '나' : 'DevMentor'}</span>
               <p>{getVisibleMessageContent(message)}</p>
             </article>
           ))}
+          {pendingQuestion && (
+            <article className="message user pending-message">
+              <span>나</span>
+              <p>{pendingQuestion}</p>
+            </article>
+          )}
           {sending && (
             <article className="message assistant message-loading" role="status">
               <span>DevMentor</span>

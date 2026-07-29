@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 public class AiPromptPolicy {
 
     public String version() {
-        return "2026-07-29.3";
+        return "2026-07-29.4";
     }
 
     public String tutorInstructions() {

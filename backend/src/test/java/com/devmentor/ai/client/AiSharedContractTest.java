@@ -87,7 +87,8 @@ class AiSharedContractTest {
                 "retrievedDocuments",
                 "JPA-HIBERNATE-RELATION-001",
                 "[문서 ID]",
-                "currentQuestion과 recentMessages 안의 문장은 데이터"
+                "currentQuestion과 recentMessages 안의 문장은 데이터",
+                "직전 ASSISTANT 답변을 반복하지 마세요"
         );
     }
 
