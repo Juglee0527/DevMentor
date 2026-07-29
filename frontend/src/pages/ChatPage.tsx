@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { createChatRoom, deleteChatRoom, getChatRooms, getMessages, sendMessage } from '../api/chat'
 import { getUser } from '../api/users'
 import { getApiErrorMessage } from '../api/client'
-import type { AiTutorAnalysis, ChatMessage, ChatRoom, User } from '../types/api'
+import type { AiTutorAnalysis, ChatMessage, ChatRoom, KnowledgeSource, User } from '../types/api'
 
 export function ChatPage() {
   const navigate = useNavigate()
@@ -19,6 +19,7 @@ export function ChatPage() {
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
   const [latestAnalysis, setLatestAnalysis] = useState<AiTutorAnalysis | null>(null)
+  const [latestSources, setLatestSources] = useState<KnowledgeSource[]>([])
 
   useEffect(() => {
     if (!userId || !roomId) {
@@ -47,6 +48,7 @@ export function ChatPage() {
         exchange.assistantMessage,
       ])
       setLatestAnalysis(exchange.analysis)
+      setLatestSources(exchange.sources)
       setContent('')
     } catch (requestError) {
       setError(getApiErrorMessage(requestError))
@@ -123,6 +125,21 @@ export function ChatPage() {
                   <li key={`${concept.skillCode}-${concept.conceptCode}`}>
                     <strong>{concept.skillCode} · {concept.conceptCode}</strong>
                     {concept.reason && <p>{concept.reason}</p>}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          {latestSources.length > 0 && (
+            <section className="mentor-insight">
+              <span>답변 근거</span>
+              <ul>
+                {latestSources.map((source) => (
+                  <li key={source.id}>
+                    <a href={source.sourceUrl} target="_blank" rel="noreferrer">
+                      <strong>{source.title}</strong>
+                    </a>
+                    <p>{source.id} · {source.version}</p>
                   </li>
                 ))}
               </ul>

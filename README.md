@@ -104,6 +104,8 @@ Copy-Item .env.example .env
 | `OLLAMA_MODEL` | `qwen2.5:7b-instruct` | Ollama에서 실행할 RAG 개발 기준 모델 |
 | `OLLAMA_TIMEOUT_SECONDS` | `120` | 로컬 모델 응답 제한 시간 |
 | `OLLAMA_MAX_OUTPUT_TOKENS` | `1024` | 로컬 모델의 최대 출력 토큰 |
+| `AI_RAG_ENABLED` | `true` | 검수된 공개 기술 문서 검색 사용 여부 |
+| `AI_RAG_MAX_DOCUMENTS` | `3` | 한 질문에 주입할 최대 근거 문서 수 |
 
 기본 `fake` 모드는 API Key 없이 결정적인 멘토 답변을 반환하므로 로컬 개발과 테스트에 사용합니다. 실제 OpenAI API를 사용하려면 `.env`에서 `AI_CLIENT_MODE=openai`, `OPENAI_API_KEY`, `OPENAI_MODEL`을 모두 설정합니다.
 

@@ -8,6 +8,7 @@ param(
     [int]$MaxOutputTokens = 512,
     [int]$Limit = 0,
     [string[]]$CaseId = @(),
+    [switch]$Rag,
     [switch]$ShowRequest
 )
 
@@ -28,6 +29,15 @@ $resolvedDatasetPath = (Resolve-Path -LiteralPath $DatasetPath).Path
 $dataset = Get-Content -Raw -Encoding UTF8 -LiteralPath $resolvedDatasetPath | ConvertFrom-Json
 $promptPath = Join-Path $PSScriptRoot "ai-evaluation-prompts.json"
 $prompts = Get-Content -Raw -Encoding UTF8 -LiteralPath $promptPath | ConvertFrom-Json
+$knowledgeDocuments = @()
+if ($Rag) {
+    $knowledgePath = Join-Path $repositoryRoot "backend\src\main\resources\knowledge\catalog.json"
+    $knowledgeDocuments = @(
+        Get-Content -Raw -Encoding UTF8 -LiteralPath $knowledgePath |
+                ConvertFrom-Json |
+                Where-Object {$_.active -eq $true -and $_.scope -eq "PUBLIC"}
+    )
+}
 
 $cases = @($dataset.cases)
 if ($CaseId.Count -gt 0) {
@@ -144,6 +154,33 @@ function Get-P95 {
     return $sorted[$index]
 }
 
+function Find-KnowledgeDocuments {
+    param([string]$Question)
+    if (-not $Rag) {
+        return @()
+    }
+
+    $normalizedQuestion = $Question.ToLowerInvariant()
+    $scored = foreach ($document in $knowledgeDocuments) {
+        $score = 0
+        foreach ($keyword in @($document.keywords)) {
+            if ($normalizedQuestion.Contains(([string]$keyword).ToLowerInvariant())) {
+                $score += 10
+            }
+        }
+        if ($score -ge 10) {
+            [pscustomobject]@{document = $document; score = $score}
+        }
+    }
+    return @(
+        $scored |
+                Sort-Object @{Expression = "score"; Descending = $true},
+                        @{Expression = {$_.document.id}; Descending = $false} |
+                Select-Object -First 3 |
+                ForEach-Object {$_.document}
+    )
+}
+
 $tutorInstructions = [string]$prompts.tutorInstructions
 $assessmentInstructions = [string]$prompts.assessmentInstructions
 
@@ -165,12 +202,25 @@ foreach ($case in $cases) {
 
     try {
         if ($case.mode -eq "TUTOR") {
+            $retrievedDocuments = @(
+                Find-KnowledgeDocuments -Question ([string]$case.request.currentQuestion) |
+                        ForEach-Object {
+                            [ordered]@{
+                                id = $_.id
+                                title = $_.title
+                                content = $_.content
+                                sourceUrl = $_.sourceUrl
+                                version = $_.version
+                            }
+                        }
+            )
             $requestContext = [ordered]@{
                 user = $case.request.user
                 currentQuestion = $case.request.currentQuestion
                 recentMessages = @($case.request.recentMessages)
                 conceptStatuses = @($case.request.conceptStatuses)
                 availableConcepts = $availableConcepts
+                retrievedDocuments = $retrievedDocuments
             }
             $input = [string]$prompts.tutorInputPrefix +
                     ($requestContext | ConvertTo-Json -Depth 15 -Compress)
@@ -243,7 +293,13 @@ foreach ($case in $cases) {
                     -Text ([string]$parsed.answer) `
                     -Terms @($case.expected.requiredTerms)
             $checks.forbiddenTerms = $true
-            foreach ($term in @($case.expected.forbiddenTerms)) {
+            $forbiddenTerms = @(
+                $case.expected.forbiddenTerms |
+                        Where-Object {
+                            -not [string]::IsNullOrWhiteSpace([string]$_)
+                        }
+            )
+            foreach ($term in $forbiddenTerms) {
                 if ($content.IndexOf([string]$term, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
                     $checks.forbiddenTerms = $false
                 }
@@ -252,6 +308,15 @@ foreach ($case in $cases) {
                 -not [string]::IsNullOrWhiteSpace([string]$parsed.followUpQuestion)
             } else {
                 $true
+            }
+            $checks.sourceCitation = if ($retrievedDocuments.Count -eq 0) {
+                $true
+            } else {
+                @(
+                    $retrievedDocuments | Where-Object {
+                        ([string]$parsed.answer).Contains("[$($_.id)]")
+                    }
+                ).Count -gt 0
             }
         } else {
             $scoreRange = @($case.expected.scoreRange)
@@ -344,12 +409,13 @@ $report = [ordered]@{
     baseUrl = $BaseUrl
     datasetPath = $resolvedDatasetPath
     datasetVersion = $dataset.datasetVersion
-    settings = [ordered]@{
+        settings = [ordered]@{
         timeoutSeconds = $TimeoutSeconds
         maxOutputTokens = $MaxOutputTokens
         think = $false
         temperature = 0
         promptVersion = [string]$prompts.version
+        ragEnabled = [bool]$Rag
     }
     summary = [ordered]@{
         total = $results.Count

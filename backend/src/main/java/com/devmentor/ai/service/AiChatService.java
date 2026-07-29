@@ -6,6 +6,7 @@ import com.devmentor.chat.dto.ChatExchangeResponse;
 import com.devmentor.chat.dto.MessageRequest;
 import com.devmentor.chat.dto.MessageResponse;
 import com.devmentor.chat.service.ChatService;
+import com.devmentor.knowledge.dto.KnowledgeSourceResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -61,7 +62,15 @@ public class AiChatService {
                 userMessage,
                 assistantMessage,
                 result.response(),
-                result.structured()
+                result.structured(),
+                context.retrievedDocuments().stream()
+                        .map(document -> new KnowledgeSourceResponse(
+                                document.id(),
+                                document.title(),
+                                document.sourceUrl(),
+                                document.version()
+                        ))
+                        .toList()
         );
     }
 

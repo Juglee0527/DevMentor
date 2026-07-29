@@ -1,0 +1,79 @@
+﻿{
+    "schemaVersion":  1,
+    "evaluatedAt":  "2026-07-29T11:28:48.3098630+09:00",
+    "model":  "qwen2.5:7b-instruct",
+    "baseUrl":  "http://localhost:11434",
+    "datasetPath":  "C:\\Users\\user\\IdeaProjects\\DevMentor\\docs\\ai-evaluation-dataset.json",
+    "datasetVersion":  "2026-07-29.1",
+    "settings":  {
+                     "timeoutSeconds":  120,
+                     "maxOutputTokens":  512,
+                     "think":  false,
+                     "temperature":  0,
+                     "promptVersion":  "2026-07-29.2",
+                     "ragEnabled":  true
+                 },
+    "summary":  {
+                    "total":  1,
+                    "successful":  1,
+                    "structured":  1,
+                    "automaticPass":  0,
+                    "successRate":  1,
+                    "structuredRate":  1,
+                    "automaticPassRate":  0,
+                    "elapsedP95Ms":  116134,
+                    "tutorP95Ms":  116134,
+                    "assessmentP95Ms":  null
+                },
+    "results":  [
+                    {
+                        "id":  "TUTOR-012",
+                        "mode":  "TUTOR",
+                        "category":  "concept_relation",
+                        "startedAt":  "2026-07-29T11:26:52.1331656+09:00",
+                        "elapsedMs":  116134,
+                        "automaticPass":  false,
+                        "checks":  {
+                                       "structured":  true,
+                                       "koreanPresent":  true,
+                                       "catalogCodesValid":  true,
+                                       "caseCodesValid":  true,
+                                       "requiredTerms":  true,
+                                       "forbiddenTerms":  true,
+                                       "followUp":  true,
+                                       "sourceCitation":  false
+                                   },
+                        "response":  {
+                                         "recommendedConcepts":  [
+                                                                     {
+                                                                         "skillCode":  "JPA",
+                                                                         "reason":  "현재 학습자의 관심 분야와 관련이 깊습니다.",
+                                                                         "conceptCode":  "JPA_HIBERNATE_RELATION"
+                                                                     }
+                                                                 ],
+                                         "followUpQuestion":  "JPA와 Hibernate의 관계를 이해하셨나요?",
+                                         "knowledgeGaps":  [
+
+                                                           ],
+                                         "answer":  "JPA(Jakarta Persistence API)와 Hibernate는 관련이 있지만 같은 제품은 아닙니다. JPA는 Java ORM(객체-관계 매핑) 표준 명세로, Entity 매핑과 EntityManager 등의 API 및 동작 규칙을 정의합니다. 반면 Hibernate는 이 명세를 구현하는 하나의 ORM 도구입니다. 따라서 JPA와 Hibernate는 JPA가 명세를 제공하고 Hibernate가 이를 구현하는 관계라고 볼 수 있습니다.\n\n실용 예제로, JPA를 사용하면 Entity 클래스를 정의할 수 있으며, 이를 Hibernate가 매핑하여 데이터베이스 테이블과 연동시킵니다. 하지만 JPA만으로는 특정 ORM 기능을 구현하기 어렵기 때문에 Hibernate와 같은 구현체가 필요합니다.\n\n[JPA-HIBERNATE_RELATION-001] 문서를 참조하면 더 자세한 내용을 확인할 수 있습니다.",
+                                         "detectedConcepts":  [
+                                                                  {
+                                                                      "skillCode":  "JPA",
+                                                                      "conceptCode":  "JPA_HIBERNATE_RELATION",
+                                                                      "confidence":  1
+                                                                  }
+                                                              ]
+                                     },
+                        "rawContent":  "{\n  \"recommendedConcepts\": [\n    {\n      \"skillCode\": \"JPA\",\n      \"reason\": \"현재 학습자의 관심 분야와 관련이 깊습니다.\",\n      \"conceptCode\": \"JPA_HIBERNATE_RELATION\"\n    }\n  ],\n  \"followUpQuestion\": \"JPA와 Hibernate의 관계를 이해하셨나요?\",\n  \"knowledgeGaps\": [],\n  \"answer\": \"JPA(Jakarta Persistence API)와 Hibernate는 관련이 있지만 같은 제품은 아닙니다. JPA는 Java ORM(객체-관계 매핑) 표준 명세로, Entity 매핑과 EntityManager 등의 API 및 동작 규칙을 정의합니다. 반면 Hibernate는 이 명세를 구현하는 하나의 ORM 도구입니다. 따라서 JPA와 Hibernate는 JPA가 명세를 제공하고 Hibernate가 이를 구현하는 관계라고 볼 수 있습니다.\\n\\n실용 예제로, JPA를 사용하면 Entity 클래스를 정의할 수 있으며, 이를 Hibernate가 매핑하여 데이터베이스 테이블과 연동시킵니다. 하지만 JPA만으로는 특정 ORM 기능을 구현하기 어렵기 때문에 Hibernate와 같은 구현체가 필요합니다.\\n\\n[JPA-HIBERNATE_RELATION-001] 문서를 참조하면 더 자세한 내용을 확인할 수 있습니다.\",\n  \"detectedConcepts\": [\n    {\n      \"skillCode\": \"JPA\",\n      \"conceptCode\": \"JPA_HIBERNATE_RELATION\",\n      \"confidence\": 1\n    }\n  ]\n}",
+                        "metrics":  {
+                                        "totalDurationNs":  113828666000,
+                                        "loadDurationNs":  15818724400,
+                                        "promptEvalCount":  2841,
+                                        "evalCount":  348,
+                                        "evalDurationNs":  61344975000,
+                                        "doneReason":  "stop"
+                                    },
+                        "error":  null
+                    }
+                ]
+}

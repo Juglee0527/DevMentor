@@ -7,8 +7,33 @@ public record AiTutorRequest(
         String currentQuestion,
         List<ConversationMessage> recentMessages,
         List<ConceptContext> conceptStatuses,
-        List<AvailableConcept> availableConcepts
+        List<AvailableConcept> availableConcepts,
+        List<RetrievedDocument> retrievedDocuments
 ) {
+
+    public AiTutorRequest {
+        recentMessages = List.copyOf(recentMessages);
+        conceptStatuses = List.copyOf(conceptStatuses);
+        availableConcepts = List.copyOf(availableConcepts);
+        retrievedDocuments = List.copyOf(retrievedDocuments);
+    }
+
+    public AiTutorRequest(
+            UserContext user,
+            String currentQuestion,
+            List<ConversationMessage> recentMessages,
+            List<ConceptContext> conceptStatuses,
+            List<AvailableConcept> availableConcepts
+    ) {
+        this(
+                user,
+                currentQuestion,
+                recentMessages,
+                conceptStatuses,
+                availableConcepts,
+                List.of()
+        );
+    }
 
     public record UserContext(
             String nickname,
@@ -38,6 +63,15 @@ public record AiTutorRequest(
             String conceptCode,
             String name,
             String difficulty
+    ) {
+    }
+
+    public record RetrievedDocument(
+            String id,
+            String title,
+            String content,
+            String sourceUrl,
+            String version
     ) {
     }
 }

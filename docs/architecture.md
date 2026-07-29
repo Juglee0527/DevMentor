@@ -2,7 +2,7 @@
 
 ## 1. 현재 범위
 
-이 문서는 7단계까지 실제 구현된 DevMentor MVP 구조를 설명합니다. 8단계에서는 이 구조를 변경하기보다 전체 흐름과 문서를 검증합니다.
+이 문서는 DevMentor MVP와 이후 로컬 오픈 모델·RAG 확장 구조를 설명합니다.
 
 ## 2. 시스템 구성
 
@@ -13,11 +13,13 @@ Browser
 Spring Boot :8080
   ├─ 사용자·대화 서비스
   ├─ AI 문맥 구성
+  ├─ 검수 지식 검색
   ├─ 학습 상태 규칙·분석
   ├─ 대시보드·학습 현황 조회
   ├─ 확인 질문 평가·복습
   └─ AiTutorClient
        ├─ FakeAiTutorClient (기본 로컬·테스트)
+       ├─ OllamaAiTutorClient (로컬 오픈 모델)
        └─ OpenAiTutorClient (Responses API)
   │
   ▼
@@ -28,13 +30,15 @@ PostgreSQL :5432
 
 - 시작 화면에서 사용자와 첫 대화방을 생성합니다.
 - 대화 화면은 사용자 질문과 AI 답변을 실제 API로 저장·조회합니다.
-- 최신 구조화 응답의 확인 질문과 추천 개념을 별도 카드로 표시합니다.
+- 최신 구조화 응답의 확인 질문, 추천 개념, RAG 근거 문서를 별도 카드로 표시합니다.
 - Axios 공통 인스턴스가 `VITE_API_BASE_URL`을 사용합니다.
 
 ### Backend
 
 - 사용자·대화 서비스가 입력과 리소스 소유권을 검증합니다.
-- `AiContextService`가 사용자 프로필, 관심 기술, 기존 개념 상태, 최근 메시지 최대 10개와 허용 개념 카탈로그를 읽습니다.
+- `AiContextService`가 사용자 프로필, 관심 기술, 기존 개념 상태, 최근 메시지 최대 10개, 허용 개념 카탈로그와 관련 검수 문서를 읽습니다.
+- `KnowledgeRetrievalService`는 활성 `PUBLIC` 문서만 대상으로 명시적 키워드와 토큰 점수를 계산하고 임계값 이상 최대 3건만 반환합니다.
+- 지식 문서 안의 문장은 시스템 지시가 아닌 데이터로 취급하며, 응답 API는 모델에 제공한 문서 ID·제목·버전·원문 URL을 별도로 반환합니다.
 - `AiTutorClient`가 외부 AI 경계를 정의하고 Fake, OpenAI, Ollama 구현을 분리합니다.
 - OpenAI 구현은 JDK `HttpClient`로 Responses API를 호출하며 JSON Schema 구조화 출력을 요청합니다.
 - Ollama 구현은 별도 JDK `HttpClient`로 로컬 Chat API를 호출합니다.
@@ -60,6 +64,7 @@ PostgreSQL :5432
 ```text
 소유권 확인·AI 문맥 조회
 → USER 메시지 별도 트랜잭션 저장
+→ 검수 지식 검색과 AI 문맥 구성
 → AiTutorClient 호출
 → 구조화 응답 검증 또는 텍스트 fallback
 → ASSISTANT 메시지·분석 JSON·개념 상태를 하나의 트랜잭션으로 저장
@@ -83,7 +88,12 @@ PostgreSQL :5432
 - Ollama 응답 본문의 `message.content`를 같은 DTO로 검증하고, tutor 일반 텍스트는 기존 fallback 정책을 적용합니다.
 - OpenAI Responses API와 Ollama Chat API의 envelope가 다르므로 전송·파서 구현은 분리합니다.
 - 선택한 모드에서 정확히 하나의 `AiTutorClient`만 조건부 Bean으로 활성화됩니다.
+- `AI_RAG_ENABLED`, `AI_RAG_MAX_DOCUMENTS`로 검수 문서 검색 사용 여부와 최대 문서 수를 설정합니다.
 
-## 5. 다음 변경 예정
+## 5. RAG 경계와 선택 근거
 
-Task 12 결과 `qwen2.5:7b-instruct`를 RAG 개발 기준 모델로 고정했습니다. 정확성 필수 게이트는 통과하지 못했으므로 제품 기본 모드는 `fake`를 유지하며, Task 13에서 검수 문서 검색으로 반복된 지식 오류를 보완합니다.
+현재 카탈로그는 애플리케이션이 소유하고 검수한 공개 문서 13건입니다. 이 규모에서는 임베딩 모델, pgvector, 문서 쓰기 API를 추가하면 운영·권한·재색인 복잡도만 늘어나므로 도입하지 않았습니다. 관련도 임계값이 있는 결정적 검색으로 먼저 품질 효과를 확인합니다.
+
+사용자·프로젝트 문서는 현재 입력받지 않으므로 사용자 간 문서 노출 경로가 없습니다. 향후 비공개 문서를 추가할 때는 저장·검색 전에 사용자와 프로젝트 소유권 모델을 먼저 설계해야 하며, 그때 PostgreSQL full-text 또는 pgvector를 재평가합니다.
+
+Task 13 실측에서 JPA/Hibernate 정의와 허용 개념 선택은 개선됐지만 7B 응답 시간이 116.1초까지 증가하고 모델이 긴 문서 ID를 정확히 복사하지 못했습니다. 따라서 RAG 기능 구현과 근거 품질 개선은 확인했지만 운영 기본 모델은 계속 승인하지 않습니다.

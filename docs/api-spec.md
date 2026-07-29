@@ -130,7 +130,15 @@ AI 답변 생성 성공 응답의 `data`:
     "followUpQuestion": "JPA와 Hibernate의 역할 차이를 설명해 보시겠어요?",
     "recommendedConcepts": []
   },
-  "structured": true
+  "structured": true,
+  "sources": [
+    {
+      "id": "JPA-HIBERNATE-RELATION-001",
+      "title": "JPA와 Hibernate의 관계",
+      "sourceUrl": "https://jakarta.ee/specifications/persistence/3.2/",
+      "version": "2026-07-29.1"
+    }
+  ]
 }
 ```
 
@@ -138,6 +146,8 @@ AI 답변 생성 성공 응답의 `data`:
 - JSON 파싱 또는 DTO 검증에 실패하면 `structured=false`, 빈 분석 배열과 일반 텍스트 답변을 반환합니다.
 - 사용자 메시지와 AI 메시지는 모두 PostgreSQL에 저장됩니다.
 - 외부 AI 호출 전에 사용자 메시지를 별도 트랜잭션으로 저장합니다. 호출 실패 시 질문은 유지되고 AI 메시지는 저장되지 않습니다.
+- `sources`는 현재 질문과 관련도 임계값을 통과해 AI 문맥에 제공된 검수 문서입니다. 검색 결과가 없으면 빈 배열입니다.
+- 현재 RAG 범위는 애플리케이션에 포함된 `PUBLIC` 검수 문서뿐이며 사용자·프로젝트 문서는 받지 않습니다.
 
 ## 6. 학습 추천 API
 
@@ -286,6 +296,6 @@ GET /api/assessments?userId={userId}
 | `502 Bad Gateway` | 외부 AI 연결·응답 실패 | 재시도를 안내하는 고정 메시지 |
 | `500 Internal Server Error` | 처리하지 못한 내부 오류 | 고정된 일반 오류 메시지 |
 
-## 12. 이후 추가 예정
+## 12. MVP 이후 확장 상태
 
-MVP API 구현은 완료되었습니다. 인증, 소셜 로그인, Repository 분석, 면접 모드, RAG는 현재 API 범위에 포함하지 않습니다.
+MVP API 구현 이후 검수 공개 문서 RAG가 대화 응답의 `sources` 필드로 확장되었습니다. 인증, 소셜 로그인, Repository 분석, 면접 모드, 사용자·프로젝트 문서 RAG는 현재 API 범위에 포함하지 않습니다.

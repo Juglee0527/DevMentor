@@ -48,6 +48,14 @@ export interface ChatExchange {
   assistantMessage: ChatMessage
   analysis: AiTutorAnalysis
   structured: boolean
+  sources: KnowledgeSource[]
+}
+
+export interface KnowledgeSource {
+  id: string
+  title: string
+  sourceUrl: string
+  version: string
 }
 
 export type LearningState =

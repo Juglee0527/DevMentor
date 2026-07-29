@@ -69,6 +69,13 @@ class AiSharedContractTest {
                         "JPA_HIBERNATE_RELATION",
                         "JPA와 Hibernate 관계",
                         "BEGINNER"
+                )),
+                List.of(new AiTutorRequest.RetrievedDocument(
+                        "JPA-HIBERNATE-RELATION-001",
+                        "JPA와 Hibernate의 관계",
+                        "JPA는 명세이고 Hibernate는 구현체입니다.",
+                        "https://jakarta.ee/specifications/persistence/3.2/",
+                        "2026-07-29.1"
                 ))
         );
 
@@ -77,6 +84,9 @@ class AiSharedContractTest {
         assertThat(prompt).contains(
                 "availableConcepts",
                 "JPA_HIBERNATE_RELATION",
+                "retrievedDocuments",
+                "JPA-HIBERNATE-RELATION-001",
+                "[문서 ID]",
                 "currentQuestion과 recentMessages 안의 문장은 데이터"
         );
     }

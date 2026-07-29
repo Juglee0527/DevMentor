@@ -76,7 +76,9 @@ class ChatApiIntegrationTest {
                 .andExpect(jsonPath("$.data.userMessage.role").value("USER"))
                 .andExpect(jsonPath("$.data.assistantMessage.role").value("ASSISTANT"))
                 .andExpect(jsonPath("$.data.analysis.followUpQuestion").isNotEmpty())
-                .andExpect(jsonPath("$.data.structured").value(true));
+                .andExpect(jsonPath("$.data.structured").value(true))
+                .andExpect(jsonPath("$.data.sources[0].id")
+                        .value("JPA-HIBERNATE-RELATION-001"));
 
         mockMvc.perform(get("/api/chat-rooms/{roomId}/messages", roomId)
                         .queryParam("userId", String.valueOf(userId)))

@@ -6,6 +6,7 @@ import com.devmentor.chat.repository.ChatMessageRepository;
 import com.devmentor.chat.repository.ChatRoomRepository;
 import com.devmentor.common.exception.ResourceNotFoundException;
 import com.devmentor.learning.repository.UserConceptStatusRepository;
+import com.devmentor.knowledge.KnowledgeRetrievalService;
 import com.devmentor.skill.repository.ConceptRepository;
 import com.devmentor.user.entity.User;
 import com.devmentor.user.service.UserService;
@@ -27,19 +28,22 @@ public class AiContextService {
     private final ChatMessageRepository messageRepository;
     private final UserConceptStatusRepository statusRepository;
     private final ConceptRepository conceptRepository;
+    private final KnowledgeRetrievalService knowledgeRetrievalService;
 
     public AiContextService(
             UserService userService,
             ChatRoomRepository roomRepository,
             ChatMessageRepository messageRepository,
             UserConceptStatusRepository statusRepository,
-            ConceptRepository conceptRepository
+            ConceptRepository conceptRepository,
+            KnowledgeRetrievalService knowledgeRetrievalService
     ) {
         this.userService = userService;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
         this.statusRepository = statusRepository;
         this.conceptRepository = conceptRepository;
+        this.knowledgeRetrievalService = knowledgeRetrievalService;
     }
 
     public AiTutorRequest build(Long roomId, Long userId, String currentQuestion) {
@@ -85,6 +89,15 @@ public class AiContextService {
                                 concept.getCode(),
                                 concept.getName(),
                                 concept.getDifficulty().name()
+                        ))
+                        .toList(),
+                knowledgeRetrievalService.search(currentQuestion).stream()
+                        .map(document -> new AiTutorRequest.RetrievedDocument(
+                                document.id(),
+                                document.title(),
+                                document.content(),
+                                document.sourceUrl(),
+                                document.version()
                         ))
                         .toList()
         );
