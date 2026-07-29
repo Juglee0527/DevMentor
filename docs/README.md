@@ -9,6 +9,8 @@
 | [product-requirements.md](./product-requirements.md) | 제품 목표, MVP 범위, 완료 조건 정의 | 요구사항이 변경될 때 |
 | [development-roadmap.md](./development-roadmap.md) | Codex에 하나씩 지시할 개발 작업 목차 | 작업 범위나 순서가 변경될 때 |
 | [open-model-development-plan.md](./open-model-development-plan.md) | 로컬 오픈 모델 연동, 평가, RAG, 선택적 파인튜닝 계획 | AI 실행 구조나 단계별 기준이 변경될 때 |
+| [ai-model-evaluation.md](./ai-model-evaluation.md) | 개발 장비, AI 품질·성능 기준, 모델 비교 결과 | 모델 평가 전후 |
+| [ai-evaluation-dataset.json](./ai-evaluation-dataset.json) | tutor·assessment 고정 평가 입력과 기대 조건 | 평가 범위나 도메인 개념이 변경될 때 |
 | [progress.md](./progress.md) | 완료 내역, 검증 결과, 다음 작업 기록 | 각 개발 작업이 끝날 때 |
 | `architecture.md` | 시스템 구조와 주요 데이터 흐름 | 1단계에서 생성 |
 | `api-spec.md` | API 계약과 요청·응답 예시 | API 구현 시 생성·갱신 |
