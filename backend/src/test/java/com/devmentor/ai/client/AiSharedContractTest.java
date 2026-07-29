@@ -107,4 +107,26 @@ class AiSharedContractTest {
                 .isInstanceOf(AiClientException.class)
                 .hasMessage("AI 평가 응답이 검증 규칙을 충족하지 못했습니다.");
     }
+
+    @Test
+    void usesAnswerTextWhenTutorMetadataValidationFails() {
+        String invalidMetadata = """
+                {
+                  "answer": "IoC는 객체의 제어권을 컨테이너에 맡기는 원리입니다.",
+                  "detectedConcepts": [
+                    {"skillCode": "SPRING", "conceptCode": "IOC_DI", "confidence": 10}
+                  ],
+                  "knowledgeGaps": [],
+                  "followUpQuestion": "DI의 장점은 무엇일까요?",
+                  "recommendedConcepts": []
+                }
+                """;
+
+        AiTutorResult result = parser.parseTutor(invalidMetadata);
+
+        assertThat(result.structured()).isFalse();
+        assertThat(result.response().answer())
+                .isEqualTo("IoC는 객체의 제어권을 컨테이너에 맡기는 원리입니다.");
+        assertThat(result.rawText()).contains("\"confidence\": 10");
+    }
 }

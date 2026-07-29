@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { createChatRoom, deleteChatRoom, getChatRooms, getMessages, sendMessage } from '../api/chat'
@@ -6,6 +6,26 @@ import { getUser } from '../api/users'
 import { getApiErrorMessage } from '../api/client'
 import { submitAiFeedback } from '../api/feedback'
 import type { AiFeedbackRating, AiTutorAnalysis, ChatMessage, ChatRoom, KnowledgeSource, User } from '../types/api'
+
+function getVisibleMessageContent(message: ChatMessage): string {
+  if (message.role !== 'ASSISTANT') {
+    return message.content
+  }
+
+  try {
+    const parsedContent: unknown = JSON.parse(message.content)
+    if (typeof parsedContent === 'object' && parsedContent !== null) {
+      const answer = (parsedContent as { answer?: unknown }).answer
+      if (typeof answer === 'string' && answer.trim()) {
+        return answer
+      }
+    }
+  } catch {
+    return message.content
+  }
+
+  return message.content
+}
 
 export function ChatPage() {
   const navigate = useNavigate()
@@ -19,6 +39,7 @@ export function ChatPage() {
   const [newTitle, setNewTitle] = useState('')
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [latestAnalysis, setLatestAnalysis] = useState<AiTutorAnalysis | null>(null)
   const [latestSources, setLatestSources] = useState<KnowledgeSource[]>([])
   const [latestAssistantMessageId, setLatestAssistantMessageId] = useState<number | null>(null)
@@ -26,6 +47,7 @@ export function ChatPage() {
   const [correctedAnswer, setCorrectedAnswer] = useState('')
   const [trainingConsent, setTrainingConsent] = useState(false)
   const [feedbackStatus, setFeedbackStatus] = useState('')
+  const messageEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!userId || !roomId) {
@@ -41,11 +63,34 @@ export function ChatPage() {
       .catch((requestError) => setError(getApiErrorMessage(requestError)))
   }, [navigate, roomId, userId])
 
+  useEffect(() => {
+    if (!sending) return
+
+    const startedAt = Date.now()
+    const intervalId = window.setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000))
+    }, 1_000)
+
+    return () => window.clearInterval(intervalId)
+  }, [sending])
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, sending, latestAnalysis])
+
   async function handleSend(event: FormEvent) {
     event.preventDefault()
-    if (!content.trim()) return
+    if (sending || !content.trim()) return
+    setElapsedSeconds(0)
     setSending(true)
     setError('')
+    setLatestAnalysis(null)
+    setLatestSources([])
+    setLatestAssistantMessageId(null)
+    setFeedbackRating(null)
+    setCorrectedAnswer('')
+    setTrainingConsent(false)
+    setFeedbackStatus('')
     try {
       const exchange = await sendMessage(roomId, userId, content)
       setMessages((current) => [
@@ -56,15 +101,22 @@ export function ChatPage() {
       setLatestAnalysis(exchange.analysis)
       setLatestSources(exchange.sources)
       setLatestAssistantMessageId(exchange.assistantMessage.id)
-      setFeedbackRating(null)
-      setCorrectedAnswer('')
-      setTrainingConsent(false)
-      setFeedbackStatus('')
       setContent('')
     } catch (requestError) {
       setError(getApiErrorMessage(requestError))
     } finally {
       setSending(false)
+    }
+  }
+
+  function handleMessageKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) {
+      return
+    }
+
+    event.preventDefault()
+    if (!sending && content.trim()) {
+      event.currentTarget.form?.requestSubmit()
     }
   }
 
@@ -133,13 +185,28 @@ export function ChatPage() {
           <button className="delete-room" type="button" onClick={handleDeleteRoom}>대화방 삭제</button>
         </header>
         <div className="message-list" aria-live="polite">
-          {messages.length === 0 && <div className="empty-message"><strong>첫 질문을 남겨보세요.</strong><span>학습 목표와 최근 대화를 바탕으로 AI 멘토가 맞춤 답변을 제공합니다.</span></div>}
+          {messages.length === 0 && !sending && <div className="empty-message"><strong>첫 질문을 남겨보세요.</strong><span>학습 목표와 최근 대화를 바탕으로 AI 멘토가 맞춤 답변을 제공합니다.</span></div>}
           {messages.map((message) => (
             <article className={`message ${message.role.toLowerCase()}`} key={message.id}>
               <span>{message.role === 'USER' ? '나' : 'DevMentor'}</span>
-              <p>{message.content}</p>
+              <p>{getVisibleMessageContent(message)}</p>
             </article>
           ))}
+          {sending && (
+            <article className="message assistant message-loading" role="status">
+              <span>DevMentor</span>
+              <div className="loading-bubble">
+                <span className="loading-spinner" aria-hidden="true" />
+                <div>
+                  <strong>답변을 준비하고 있습니다.</strong>
+                  <small>
+                    로컬 AI가 질문을 분석 중입니다.
+                    {elapsedSeconds > 0 && ` ${elapsedSeconds}초 경과`}
+                  </small>
+                </div>
+              </div>
+            </article>
+          )}
           {latestAnalysis?.followUpQuestion && (
             <section className="mentor-insight">
               <span>확인 질문</span>
@@ -206,12 +273,16 @@ export function ChatPage() {
               {feedbackStatus && <p>{feedbackStatus}</p>}
             </form>
           )}
+          <div ref={messageEndRef} />
         </div>
         {error && <p className="form-error chat-error">{error}</p>}
         <form className="message-form" onSubmit={handleSend}>
           <textarea aria-label="메시지" placeholder="개발 질문을 입력하세요." maxLength={10000}
-            value={content} onChange={(e) => setContent(e.target.value)} />
-          <button type="submit" disabled={sending || !content.trim()}>{sending ? '저장 중' : '메시지 저장'}</button>
+            value={content} onChange={(e) => setContent(e.target.value)}
+            onKeyDown={handleMessageKeyDown} />
+          <button type="submit" disabled={sending || !content.trim()}>
+            {sending ? '답변 대기 중' : '메시지 저장'}
+          </button>
         </form>
       </section>
 

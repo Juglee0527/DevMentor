@@ -3,6 +3,7 @@ package com.devmentor.ai.client;
 import com.devmentor.ai.dto.AiTutorResponse;
 import com.devmentor.assessment.dto.AssessmentAiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -60,10 +61,25 @@ public class AiStructuredContentParser {
     }
 
     private AiTutorResult fallback(String content) {
-        AiTutorResponse fallback = AiTutorResponse.fallback(content);
+        AiTutorResponse fallback = AiTutorResponse.fallback(extractAnswer(content));
         if (fallback.answer().isBlank()) {
             throw new AiClientException("AI 응답에 답변 내용이 없습니다.");
         }
         return new AiTutorResult(fallback, content, false);
+    }
+
+    private String extractAnswer(String content) {
+        try {
+            JsonNode parsedContent = objectMapper.readTree(content);
+            if (parsedContent != null) {
+                String answer = parsedContent.path("answer").asText();
+                if (!answer.isBlank()) {
+                    return answer;
+                }
+            }
+        } catch (JsonProcessingException ignored) {
+            // 구조화되지 않은 일반 텍스트는 기존 fallback 경로로 처리합니다.
+        }
+        return content;
     }
 }
