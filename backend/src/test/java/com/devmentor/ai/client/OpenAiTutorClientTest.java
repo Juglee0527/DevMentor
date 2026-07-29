@@ -22,7 +22,10 @@ class OpenAiTutorClientTest {
     void setUp() {
         objectMapper = new ObjectMapper();
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        parser = new OpenAiResponseParser(objectMapper, validator);
+        parser = new OpenAiResponseParser(
+                objectMapper,
+                new AiStructuredContentParser(objectMapper, validator)
+        );
     }
 
     @Test
@@ -83,6 +86,8 @@ class OpenAiTutorClientTest {
                 failingTransport,
                 parser,
                 new AiTutorPromptBuilder(objectMapper),
+                new AiPromptPolicy(),
+                new AiResponseSchemaFactory(objectMapper),
                 objectMapper,
                 "https://api.openai.com/v1",
                 "test-key",
@@ -162,7 +167,13 @@ class OpenAiTutorClientTest {
                 ),
                 "영속성 컨텍스트가 무엇인가요?",
                 List.of(),
-                List.of()
+                List.of(),
+                List.of(new AiTutorRequest.AvailableConcept(
+                        "JPA",
+                        "PERSISTENCE_CONTEXT",
+                        "영속성 컨텍스트",
+                        "INTERMEDIATE"
+                ))
         );
     }
 }

@@ -25,7 +25,10 @@ class OllamaAiTutorClientTest {
     void setUp() {
         objectMapper = new ObjectMapper();
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        parser = new OllamaResponseParser(objectMapper, validator);
+        parser = new OllamaResponseParser(
+                objectMapper,
+                new AiStructuredContentParser(objectMapper, validator)
+        );
     }
 
     @Test
@@ -136,6 +139,8 @@ class OllamaAiTutorClientTest {
                 transport,
                 parser,
                 new AiTutorPromptBuilder(objectMapper),
+                new AiPromptPolicy(),
+                new AiResponseSchemaFactory(objectMapper),
                 objectMapper,
                 "http://localhost:11434",
                 " ",
@@ -151,6 +156,8 @@ class OllamaAiTutorClientTest {
                 transport,
                 parser,
                 new AiTutorPromptBuilder(objectMapper),
+                new AiPromptPolicy(),
+                new AiResponseSchemaFactory(objectMapper),
                 objectMapper,
                 "http://localhost:11434/",
                 "test-model",
@@ -178,7 +185,13 @@ class OllamaAiTutorClientTest {
                 ),
                 "영속성 컨텍스트가 무엇인가요?",
                 List.of(),
-                List.of()
+                List.of(),
+                List.of(new AiTutorRequest.AvailableConcept(
+                        "JPA",
+                        "PERSISTENCE_CONTEXT",
+                        "영속성 컨텍스트",
+                        "INTERMEDIATE"
+                ))
         );
     }
 }

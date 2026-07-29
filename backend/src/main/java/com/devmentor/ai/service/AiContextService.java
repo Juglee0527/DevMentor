@@ -6,6 +6,7 @@ import com.devmentor.chat.repository.ChatMessageRepository;
 import com.devmentor.chat.repository.ChatRoomRepository;
 import com.devmentor.common.exception.ResourceNotFoundException;
 import com.devmentor.learning.repository.UserConceptStatusRepository;
+import com.devmentor.skill.repository.ConceptRepository;
 import com.devmentor.user.entity.User;
 import com.devmentor.user.service.UserService;
 import org.springframework.stereotype.Service;
@@ -25,17 +26,20 @@ public class AiContextService {
     private final ChatRoomRepository roomRepository;
     private final ChatMessageRepository messageRepository;
     private final UserConceptStatusRepository statusRepository;
+    private final ConceptRepository conceptRepository;
 
     public AiContextService(
             UserService userService,
             ChatRoomRepository roomRepository,
             ChatMessageRepository messageRepository,
-            UserConceptStatusRepository statusRepository
+            UserConceptStatusRepository statusRepository,
+            ConceptRepository conceptRepository
     ) {
         this.userService = userService;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
         this.statusRepository = statusRepository;
+        this.conceptRepository = conceptRepository;
     }
 
     public AiTutorRequest build(Long roomId, Long userId, String currentQuestion) {
@@ -73,6 +77,14 @@ public class AiContextService {
                                 status.getConcept().getCode(),
                                 status.getUnderstandingScore(),
                                 status.getLearningStatus().name()
+                        ))
+                        .toList(),
+                conceptRepository.findAllWithSkillOrderByDisplayOrder().stream()
+                        .map(concept -> new AiTutorRequest.AvailableConcept(
+                                concept.getSkill().getCode(),
+                                concept.getCode(),
+                                concept.getName(),
+                                concept.getDifficulty().name()
                         ))
                         .toList()
         );

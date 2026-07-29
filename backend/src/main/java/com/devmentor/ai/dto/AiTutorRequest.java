@@ -6,7 +6,8 @@ public record AiTutorRequest(
         UserContext user,
         String currentQuestion,
         List<ConversationMessage> recentMessages,
-        List<ConceptContext> conceptStatuses
+        List<ConceptContext> conceptStatuses,
+        List<AvailableConcept> availableConcepts
 ) {
 
     public record UserContext(
@@ -29,6 +30,14 @@ public record AiTutorRequest(
             String conceptCode,
             int understandingScore,
             String learningStatus
+    ) {
+    }
+
+    public record AvailableConcept(
+            String skillCode,
+            String conceptCode,
+            String name,
+            String difficulty
     ) {
     }
 }

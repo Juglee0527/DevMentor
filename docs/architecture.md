@@ -34,10 +34,12 @@ PostgreSQL :5432
 ### Backend
 
 - 사용자·대화 서비스가 입력과 리소스 소유권을 검증합니다.
-- `AiContextService`가 사용자 프로필, 관심 기술, 기존 개념 상태, 최근 메시지 최대 10개를 읽습니다.
-- `AiTutorClient`가 외부 AI 경계를 정의하고 Fake와 OpenAI 구현을 분리합니다.
+- `AiContextService`가 사용자 프로필, 관심 기술, 기존 개념 상태, 최근 메시지 최대 10개와 허용 개념 카탈로그를 읽습니다.
+- `AiTutorClient`가 외부 AI 경계를 정의하고 Fake, OpenAI, Ollama 구현을 분리합니다.
 - OpenAI 구현은 JDK `HttpClient`로 Responses API를 호출하며 JSON Schema 구조화 출력을 요청합니다.
-- 외부 응답은 Jackson 파싱 후 Bean Validation으로 다시 검증합니다.
+- Ollama 구현은 별도 JDK `HttpClient`로 로컬 Chat API를 호출합니다.
+- 시스템 지시문, tutor/assessment JSON Schema, 구조화 내용 파싱은 모델 구현체와 무관한 공통 컴포넌트입니다.
+- 외부 응답은 Jackson 파싱 후 Bean Validation과 평가 논리 일관성 규칙으로 다시 검증합니다.
 - 파싱·필드 검증 실패는 일반 텍스트 답변으로 전환하고, 연결·HTTP 오류는 `502`로 변환합니다.
 - `LearningProgressPolicy`가 AI 값과 분리된 고정 규칙으로 점수·상태·복습일을 계산합니다.
 - 감지 신뢰도 0.6 미만, 알 수 없는 코드, 한 응답의 중복 개념은 상태 오염을 막기 위해 필터링합니다.
@@ -84,4 +86,4 @@ PostgreSQL :5432
 
 ## 5. 다음 변경 예정
 
-Task 11에서 OpenAI와 Ollama 구현체가 중복 보유한 시스템 지시문과 JSON Schema 생성 책임을 공통 컴포넌트로 이동합니다.
+Task 12에서 고정 평가셋으로 로컬 모델의 품질·속도·라이선스를 비교하고 현재 장비의 기본 모델을 확정합니다.
