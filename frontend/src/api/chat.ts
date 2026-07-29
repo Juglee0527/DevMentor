@@ -1,4 +1,4 @@
-import { apiClient } from './client'
+import { AI_REQUEST_TIMEOUT_MS, apiClient } from './client'
 import type { ApiResponse, ChatExchange, ChatMessage, ChatRoom } from '../types/api'
 
 export async function createChatRoom(
@@ -38,7 +38,10 @@ export async function sendMessage(
   const response = await apiClient.post<ApiResponse<ChatExchange>>(
     `/chat-rooms/${roomId}/messages`,
     { content },
-    { params: { userId } },
+    {
+      params: { userId },
+      timeout: AI_REQUEST_TIMEOUT_MS,
+    },
   )
   return response.data.data
 }

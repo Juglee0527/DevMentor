@@ -1,4 +1,4 @@
-import { apiClient } from './client'
+import { AI_REQUEST_TIMEOUT_MS, apiClient } from './client'
 import type { ApiResponse, AssessmentResult, ReviewTarget } from '../types/api'
 
 export async function getReviewTargets(userId: number): Promise<ReviewTarget[]> {
@@ -30,6 +30,7 @@ export async function submitAssessment(
       conceptCode: target.conceptCode,
       userAnswer,
     },
+    { timeout: AI_REQUEST_TIMEOUT_MS },
   )
   return response.data.data
 }
