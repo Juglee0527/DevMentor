@@ -1,5 +1,6 @@
 package com.devmentor.knowledge;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ public class KnowledgeRetrievalService {
     private final boolean enabled;
     private final int maxDocuments;
 
+    @Autowired
     public KnowledgeRetrievalService(
             KnowledgeCatalog catalog,
             @Value("${app.ai.rag.enabled:true}") boolean enabled,
