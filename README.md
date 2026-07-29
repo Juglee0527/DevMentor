@@ -97,6 +97,7 @@ Copy-Item .env.example .env
 | `VITE_API_BASE_URL` | `http://localhost:8080/api` | 프론트엔드 API 주소 |
 | `FRONTEND_ORIGIN` | `http://localhost:5173` | 백엔드가 허용하는 프론트엔드 Origin |
 | `AI_CLIENT_MODE` | `fake` | `fake`, `ollama`, `openai` AI 구현 선택 |
+| `AI_MODEL_VERSION` | 빈 값 | 평가에 사용한 모델 digest·양자화 식별자 |
 | `OPENAI_API_KEY` | 빈 값 | OpenAI 모드 인증 Key |
 | `OPENAI_MODEL` | 빈 값 | OpenAI 모드에서 사용할 모델 |
 | `OPENAI_TIMEOUT_SECONDS` | `30` | OpenAI 응답 제한 시간 |
@@ -122,11 +123,18 @@ ollama list
 AI_CLIENT_MODE=ollama
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=qwen2.5:7b-instruct
+AI_MODEL_VERSION=845dbda0ea48/Q4_K_M
 OLLAMA_TIMEOUT_SECONDS=120
 OLLAMA_MAX_OUTPUT_TOKENS=1024
 ```
 
 Ollama가 실행되지 않았거나 지정 모델이 설치되지 않으면 백엔드는 안전한 `502` 응답을 반환합니다. `qwen2.5:7b-instruct`는 Task 12 비교에서 한국어와 구조화 출력이 가장 안정적이어서 RAG 개발 기준 모델로 고정했지만, 정확성 필수 게이트는 통과하지 못했습니다. 따라서 제품 기본값과 자동 테스트·CI는 계속 `fake` 모드를 사용하고 `ollama` 모드는 명시적으로 선택할 때만 활성화합니다.
+
+AI 답변 직후 화면에서 도움 여부, 수정 답안, 모델 개선 활용 동의를 저장할 수 있습니다. 학습 동의는 선택 사항이며 피드백 삭제 API로 철회할 수 있습니다. LoRA 학습은 자동으로 시작되지 않으며 다음 명령이 모든 적격성 조건을 통과할 때만 데이터 준비를 검토합니다.
+
+```powershell
+.\scripts\check-lora-eligibility.ps1
+```
 
 ## 실행 방법
 

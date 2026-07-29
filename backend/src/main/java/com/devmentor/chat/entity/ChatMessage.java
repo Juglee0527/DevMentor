@@ -29,6 +29,26 @@ public class ChatMessage {
     @Column(columnDefinition = "text")
     private String analysisJson;
 
+    @Column(length = 20)
+    private String aiProvider;
+
+    @Column(length = 100)
+    private String aiModel;
+
+    @Column(length = 100)
+    private String aiModelVersion;
+
+    @Column(length = 30)
+    private String aiPromptVersion;
+
+    private Long aiResponseTimeMs;
+
+    @Column(length = 50)
+    private String aiFailureType;
+
+    @Column(columnDefinition = "text")
+    private String aiSourceIds;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -40,6 +60,27 @@ public class ChatMessage {
         this.role = role;
         this.content = content;
         this.analysisJson = analysisJson;
+    }
+
+    public void attachAiMetadata(
+            String provider,
+            String model,
+            String modelVersion,
+            String promptVersion,
+            long responseTimeMs,
+            String failureType,
+            String sourceIds
+    ) {
+        if (role != MessageRole.ASSISTANT) {
+            throw new IllegalStateException("AI 메타데이터는 ASSISTANT 메시지에만 저장할 수 있습니다.");
+        }
+        this.aiProvider = provider;
+        this.aiModel = model;
+        this.aiModelVersion = modelVersion;
+        this.aiPromptVersion = promptVersion;
+        this.aiResponseTimeMs = responseTimeMs;
+        this.aiFailureType = failureType;
+        this.aiSourceIds = sourceIds;
     }
 
     @PrePersist
@@ -65,6 +106,34 @@ public class ChatMessage {
 
     public String getAnalysisJson() {
         return analysisJson;
+    }
+
+    public String getAiProvider() {
+        return aiProvider;
+    }
+
+    public String getAiModel() {
+        return aiModel;
+    }
+
+    public String getAiModelVersion() {
+        return aiModelVersion;
+    }
+
+    public String getAiPromptVersion() {
+        return aiPromptVersion;
+    }
+
+    public Long getAiResponseTimeMs() {
+        return aiResponseTimeMs;
+    }
+
+    public String getAiFailureType() {
+        return aiFailureType;
+    }
+
+    public String getAiSourceIds() {
+        return aiSourceIds;
     }
 
     public LocalDateTime getCreatedAt() {

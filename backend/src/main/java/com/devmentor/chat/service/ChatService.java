@@ -76,7 +76,8 @@ public class ChatService {
             Long roomId,
             Long userId,
             String content,
-            String analysisJson
+            String analysisJson,
+            ChatAiMetadata metadata
     ) {
         ChatRoom room = findOwnedRoom(roomId, userId);
         ChatMessage message = new ChatMessage(
@@ -84,6 +85,15 @@ public class ChatService {
                 MessageRole.ASSISTANT,
                 content,
                 analysisJson
+        );
+        message.attachAiMetadata(
+                metadata.provider(),
+                metadata.model(),
+                metadata.modelVersion(),
+                metadata.promptVersion(),
+                metadata.responseTimeMs(),
+                metadata.failureType(),
+                String.join(",", metadata.sourceIds())
         );
         room.markActive();
         return MessageResponse.from(messageRepository.save(message));

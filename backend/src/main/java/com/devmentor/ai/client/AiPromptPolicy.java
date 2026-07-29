@@ -5,6 +5,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class AiPromptPolicy {
 
+    public String version() {
+        return "2026-07-29.2";
+    }
+
     public String tutorInstructions() {
         return """
                 반드시 자연스러운 한국어로만 답변하세요.

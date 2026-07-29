@@ -58,6 +58,25 @@ export interface KnowledgeSource {
   version: string
 }
 
+export type AiFeedbackRating = 'HELPFUL' | 'NOT_HELPFUL'
+
+export interface AiFeedback {
+  id: number
+  chatMessageId: number
+  rating: AiFeedbackRating
+  correctedAnswer: string | null
+  trainingConsent: boolean
+  consentedAt: string | null
+  modelProvider: string | null
+  modelName: string | null
+  modelVersion: string | null
+  promptVersion: string | null
+  responseTimeMs: number | null
+  failureType: string | null
+  sourceIds: string[]
+  updatedAt: string
+}
+
 export type LearningState =
   | 'NOT_STARTED'
   | 'LEARNING'

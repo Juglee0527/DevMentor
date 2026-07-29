@@ -17,6 +17,7 @@ Skill 1 ─ N Concept
 User 1 ─ N UserConceptStatus N ─ 1 Concept
 User 1 ─ N Assessment N ─ 1 Concept
 ChatMessage 1 ─ N Assessment
+User 1 ─ N AiFeedback N ─ 1 ChatMessage
 ```
 
 ## 3. 주요 테이블
@@ -31,12 +32,18 @@ ChatMessage 1 ─ N Assessment
 | `concepts` | 기술별 개념 | 기술·code 조합 unique |
 | `user_concept_statuses` | 사용자별 이해 상태 | 사용자·개념 unique, 점수 0~100 |
 | `assessments` | 확인 질문 평가 | 점수 0~100, 사용자·개념·메시지 FK, 사용자·메시지·개념 유일성 |
+| `ai_feedback` | AI 답변 검수·학습 동의 snapshot | 사용자·메시지 unique, 동의·삭제 시각 인덱스 |
 
 ## 4. enum
 
 - `MessageRole`: `USER`, `ASSISTANT`, `SYSTEM`
 - `ConceptDifficulty`: `BEGINNER`, `INTERMEDIATE`, `ADVANCED`
 - `LearningStatus`: `NOT_STARTED`, `LEARNING`, `UNDERSTOOD`, `NEEDS_REVIEW`
+- `FeedbackRating`: `HELPFUL`, `NOT_HELPFUL`
+
+`chat_messages`의 AI 답변에는 provider, model tag·version, 프롬프트 버전, 응답 시간, fallback 실패 유형, RAG 문서 ID를 저장합니다. `ai_feedback`은 피드백 시점의 질문·생성 답변과 이 메타데이터를 snapshot하여 이후 모델 설정 변경과 분리합니다.
+
+피드백 삭제는 `deleted_at`과 동의 해제로 추적합니다. 철회된 행은 학습 데이터 집계에서 제외하며, 실제 보존 기간과 물리 파기 정책은 인증·개인정보 운영 정책을 정하기 전까지 운영 배포할 수 없습니다.
 
 ## 5. 초기 데이터
 

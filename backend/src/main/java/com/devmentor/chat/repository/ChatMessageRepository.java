@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
@@ -26,6 +27,12 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     Optional<ChatMessage> findOwnedById(
             @Param("messageId") Long messageId,
             @Param("userId") Long userId
+    );
+
+    Optional<ChatMessage> findTopByChatRoomIdAndRoleAndCreatedAtBeforeOrderByCreatedAtDesc(
+            Long chatRoomId,
+            MessageRole role,
+            LocalDateTime createdAt
     );
 
     @Query("""

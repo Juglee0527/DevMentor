@@ -18,6 +18,12 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private static final String INTERNAL_SERVER_ERROR_MESSAGE = "서버에서 요청을 처리하지 못했습니다.";
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBadRequest(BadRequestException exception) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.failure(exception.getMessage()));
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(
             ResourceNotFoundException exception

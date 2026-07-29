@@ -3,6 +3,7 @@ package com.devmentor.ai.service;
 import com.devmentor.ai.client.AiTutorClient;
 import com.devmentor.ai.client.AiTutorResult;
 import com.devmentor.chat.dto.ChatExchangeResponse;
+import com.devmentor.chat.dto.ChatAiMetadata;
 import com.devmentor.chat.dto.MessageRequest;
 import com.devmentor.chat.dto.MessageResponse;
 import com.devmentor.chat.service.ChatService;
@@ -23,19 +24,22 @@ public class AiChatService {
     private final ChatService chatService;
     private final AiResultPersistenceService resultPersistenceService;
     private final ObjectMapper objectMapper;
+    private final AiRuntimeDescriptor runtimeDescriptor;
 
     public AiChatService(
             AiContextService contextService,
             AiTutorClient aiTutorClient,
             ChatService chatService,
             AiResultPersistenceService resultPersistenceService,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            AiRuntimeDescriptor runtimeDescriptor
     ) {
         this.contextService = contextService;
         this.aiTutorClient = aiTutorClient;
         this.chatService = chatService;
         this.resultPersistenceService = resultPersistenceService;
         this.objectMapper = objectMapper;
+        this.runtimeDescriptor = runtimeDescriptor;
     }
 
     public ChatExchangeResponse sendMessage(
@@ -47,7 +51,9 @@ public class AiChatService {
         var context = contextService.build(roomId, userId, question);
         MessageResponse userMessage = chatService.saveUserMessage(roomId, userId, request);
 
+        long startedAt = System.nanoTime();
         AiTutorResult result = aiTutorClient.ask(context);
+        long responseTimeMs = (System.nanoTime() - startedAt) / 1_000_000;
         if (!result.structured()) {
             log.warn("AI structured response validation failed; using text fallback");
         }
@@ -56,7 +62,18 @@ public class AiChatService {
                 roomId,
                 userId,
                 result.response(),
-                serializeAnalysis(result)
+                serializeAnalysis(result),
+                new ChatAiMetadata(
+                        runtimeDescriptor.provider(),
+                        runtimeDescriptor.model(),
+                        runtimeDescriptor.modelVersion(),
+                        runtimeDescriptor.promptVersion(),
+                        responseTimeMs,
+                        result.structured() ? null : "STRUCTURED_FALLBACK",
+                        context.retrievedDocuments().stream()
+                                .map(document -> document.id())
+                                .toList()
+                )
         );
         return new ChatExchangeResponse(
                 userMessage,

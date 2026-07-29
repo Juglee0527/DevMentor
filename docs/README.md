@@ -12,6 +12,7 @@
 | [ai-model-evaluation.md](./ai-model-evaluation.md) | 개발 장비, AI 품질·성능 기준, 모델 비교 결과 | 모델 평가 전후 |
 | [ai-evaluation-dataset.json](./ai-evaluation-dataset.json) | tutor·assessment 고정 평가 입력과 기대 조건 | 평가 범위나 도메인 개념이 변경될 때 |
 | [rag-evaluation.md](./rag-evaluation.md) | 검수 지식 검색 구조와 RAG 전후 평가 | 문서 카탈로그·검색 정책·RAG 결과가 변경될 때 |
+| [lora-readiness.md](./lora-readiness.md) | 피드백 동의·삭제·LoRA 적격성 게이트 | 수집 항목·학습 기준·보류 사유가 변경될 때 |
 | [progress.md](./progress.md) | 완료 내역, 검증 결과, 다음 작업 기록 | 각 개발 작업이 끝날 때 |
 | `architecture.md` | 시스템 구조와 주요 데이터 흐름 | 1단계에서 생성 |
 | `api-spec.md` | API 계약과 요청·응답 예시 | API 구현 시 생성·갱신 |

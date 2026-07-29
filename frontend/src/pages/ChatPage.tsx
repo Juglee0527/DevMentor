@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom'
 import { createChatRoom, deleteChatRoom, getChatRooms, getMessages, sendMessage } from '../api/chat'
 import { getUser } from '../api/users'
 import { getApiErrorMessage } from '../api/client'
-import type { AiTutorAnalysis, ChatMessage, ChatRoom, KnowledgeSource, User } from '../types/api'
+import { submitAiFeedback } from '../api/feedback'
+import type { AiFeedbackRating, AiTutorAnalysis, ChatMessage, ChatRoom, KnowledgeSource, User } from '../types/api'
 
 export function ChatPage() {
   const navigate = useNavigate()
@@ -20,6 +21,11 @@ export function ChatPage() {
   const [sending, setSending] = useState(false)
   const [latestAnalysis, setLatestAnalysis] = useState<AiTutorAnalysis | null>(null)
   const [latestSources, setLatestSources] = useState<KnowledgeSource[]>([])
+  const [latestAssistantMessageId, setLatestAssistantMessageId] = useState<number | null>(null)
+  const [feedbackRating, setFeedbackRating] = useState<AiFeedbackRating | null>(null)
+  const [correctedAnswer, setCorrectedAnswer] = useState('')
+  const [trainingConsent, setTrainingConsent] = useState(false)
+  const [feedbackStatus, setFeedbackStatus] = useState('')
 
   useEffect(() => {
     if (!userId || !roomId) {
@@ -49,11 +55,34 @@ export function ChatPage() {
       ])
       setLatestAnalysis(exchange.analysis)
       setLatestSources(exchange.sources)
+      setLatestAssistantMessageId(exchange.assistantMessage.id)
+      setFeedbackRating(null)
+      setCorrectedAnswer('')
+      setTrainingConsent(false)
+      setFeedbackStatus('')
       setContent('')
     } catch (requestError) {
       setError(getApiErrorMessage(requestError))
     } finally {
       setSending(false)
+    }
+  }
+
+  async function handleFeedbackSubmit(event: FormEvent) {
+    event.preventDefault()
+    if (!latestAssistantMessageId || !feedbackRating) return
+    setError('')
+    try {
+      await submitAiFeedback(
+        userId,
+        latestAssistantMessageId,
+        feedbackRating,
+        correctedAnswer,
+        trainingConsent,
+      )
+      setFeedbackStatus('피드백을 저장했습니다.')
+    } catch (requestError) {
+      setError(getApiErrorMessage(requestError))
     }
   }
 
@@ -144,6 +173,38 @@ export function ChatPage() {
                 ))}
               </ul>
             </section>
+          )}
+          {latestAssistantMessageId && (
+            <form className="mentor-insight" onSubmit={handleFeedbackSubmit}>
+              <span>이 답변은 도움이 되었나요?</span>
+              <div>
+                <button type="button" onClick={() => setFeedbackRating('HELPFUL')}>
+                  도움됨
+                </button>
+                <button type="button" onClick={() => setFeedbackRating('NOT_HELPFUL')}>
+                  수정 필요
+                </button>
+              </div>
+              {feedbackRating === 'NOT_HELPFUL' && (
+                <textarea
+                  aria-label="수정 답안"
+                  placeholder="더 나은 답안을 적어 주세요."
+                  maxLength={20000}
+                  value={correctedAnswer}
+                  onChange={(event) => setCorrectedAnswer(event.target.value)}
+                />
+              )}
+              <label>
+                <input
+                  type="checkbox"
+                  checked={trainingConsent}
+                  onChange={(event) => setTrainingConsent(event.target.checked)}
+                />
+                이 질문·답변·수정 내용을 모델 개선 데이터로 사용하는 데 동의합니다.
+              </label>
+              <button type="submit" disabled={!feedbackRating}>피드백 저장</button>
+              {feedbackStatus && <p>{feedbackStatus}</p>}
+            </form>
           )}
         </div>
         {error && <p className="form-error chat-error">{error}</p>}

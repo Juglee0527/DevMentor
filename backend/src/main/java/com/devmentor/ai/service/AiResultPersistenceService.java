@@ -2,6 +2,7 @@ package com.devmentor.ai.service;
 
 import com.devmentor.ai.dto.AiTutorResponse;
 import com.devmentor.chat.dto.MessageResponse;
+import com.devmentor.chat.dto.ChatAiMetadata;
 import com.devmentor.chat.service.ChatService;
 import com.devmentor.learning.service.LearningAnalysisService;
 import org.springframework.stereotype.Service;
@@ -26,13 +27,15 @@ public class AiResultPersistenceService {
             Long roomId,
             Long userId,
             AiTutorResponse analysis,
-            String analysisJson
+            String analysisJson,
+            ChatAiMetadata metadata
     ) {
         MessageResponse message = chatService.saveAssistantMessage(
                 roomId,
                 userId,
                 analysis.answer(),
-                analysisJson
+                analysisJson,
+                metadata
         );
         learningAnalysisService.apply(userId, analysis);
         return message;

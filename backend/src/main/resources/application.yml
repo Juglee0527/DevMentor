@@ -25,6 +25,7 @@ app:
     allowed-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
   ai:
     mode: ${AI_CLIENT_MODE:fake}
+    model-version: ${AI_MODEL_VERSION:}
     openai:
       base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
       api-key: ${OPENAI_API_KEY:}

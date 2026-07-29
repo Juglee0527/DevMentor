@@ -299,3 +299,57 @@ GET /api/assessments?userId={userId}
 ## 12. MVP 이후 확장 상태
 
 MVP API 구현 이후 검수 공개 문서 RAG가 대화 응답의 `sources` 필드로 확장되었습니다. 인증, 소셜 로그인, Repository 분석, 면접 모드, 사용자·프로젝트 문서 RAG는 현재 API 범위에 포함하지 않습니다.
+
+## 13. AI 피드백과 학습 적격성 API
+
+피드백 저장 또는 갱신:
+
+```http
+POST /api/ai-feedback
+```
+
+```json
+{
+  "userId": 1,
+  "chatMessageId": 2,
+  "rating": "NOT_HELPFUL",
+  "correctedAnswer": "JPA는 명세이고 Hibernate는 구현체입니다.",
+  "trainingConsent": true
+}
+```
+
+- 대상 메시지가 해당 사용자의 `ASSISTANT` 메시지인지 확인합니다.
+- 같은 사용자·메시지의 피드백은 새 행을 만들지 않고 갱신합니다.
+- `NOT_HELPFUL` 답변을 학습에 사용하도록 동의할 때는 수정 답안이 필수입니다.
+- 질문·생성 답변, 모델 tag·version, 프롬프트 버전, 응답 시간, 실패 유형, RAG 문서 ID를 서버 값으로 snapshot합니다.
+
+동의 철회와 삭제 추적:
+
+```http
+DELETE /api/ai-feedback/{feedbackId}?userId={userId}
+```
+
+행을 즉시 물리 삭제하지 않고 `deletedAt`을 기록하며 `trainingConsent=false`로 전환합니다. 철회된 데이터는 학습 적격성 집계에서 제외됩니다.
+
+LoRA 적격성 확인:
+
+```http
+GET /api/ai-feedback/training-eligibility
+```
+
+```json
+{
+  "eligible": false,
+  "consentedFeedbackCount": 0,
+  "correctedAnswerCount": 0,
+  "minimumConsentedFeedback": 300,
+  "minimumCorrectedAnswers": 200,
+  "separateEvaluationDatasetReady": true,
+  "blockers": [
+    "학습 동의 피드백이 최소 300건보다 부족합니다.",
+    "검수된 수정 답안이 최소 200건보다 부족합니다."
+  ]
+}
+```
+
+이 API는 학습을 실행하지 않습니다. `eligible=false`이면 데이터 export, LoRA 학습, 어댑터 배포를 진행하지 않습니다.
