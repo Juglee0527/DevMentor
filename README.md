@@ -101,7 +101,7 @@ Copy-Item .env.example .env
 | `OPENAI_MODEL` | 빈 값 | OpenAI 모드에서 사용할 모델 |
 | `OPENAI_TIMEOUT_SECONDS` | `30` | OpenAI 응답 제한 시간 |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama API 주소 |
-| `OLLAMA_MODEL` | `qwen3.5:4b` | Ollama에서 실행할 로컬 모델 후보 |
+| `OLLAMA_MODEL` | `qwen2.5:7b-instruct` | Ollama에서 실행할 RAG 개발 기준 모델 |
 | `OLLAMA_TIMEOUT_SECONDS` | `120` | 로컬 모델 응답 제한 시간 |
 | `OLLAMA_MAX_OUTPUT_TOKENS` | `1024` | 로컬 모델의 최대 출력 토큰 |
 
@@ -110,7 +110,7 @@ Copy-Item .env.example .env
 로컬 오픈 모델을 사용하려면 먼저 [Ollama for Windows](https://docs.ollama.com/windows)를 설치하고 모델을 준비합니다.
 
 ```powershell
-ollama pull qwen3.5:4b
+ollama pull qwen2.5:7b-instruct
 ollama list
 ```
 
@@ -119,12 +119,12 @@ ollama list
 ```dotenv
 AI_CLIENT_MODE=ollama
 OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=qwen3.5:4b
+OLLAMA_MODEL=qwen2.5:7b-instruct
 OLLAMA_TIMEOUT_SECONDS=120
 OLLAMA_MAX_OUTPUT_TOKENS=1024
 ```
 
-Ollama가 실행되지 않았거나 지정 모델이 설치되지 않으면 백엔드는 안전한 `502` 응답을 반환합니다. 실제 모델 호출은 장비 성능에 따라 오래 걸릴 수 있으므로 기본 자동 테스트와 CI는 계속 `fake` 모드를 사용합니다.
+Ollama가 실행되지 않았거나 지정 모델이 설치되지 않으면 백엔드는 안전한 `502` 응답을 반환합니다. `qwen2.5:7b-instruct`는 Task 12 비교에서 한국어와 구조화 출력이 가장 안정적이어서 RAG 개발 기준 모델로 고정했지만, 정확성 필수 게이트는 통과하지 못했습니다. 따라서 제품 기본값과 자동 테스트·CI는 계속 `fake` 모드를 사용하고 `ollama` 모드는 명시적으로 선택할 때만 활성화합니다.
 
 ## 실행 방법
 

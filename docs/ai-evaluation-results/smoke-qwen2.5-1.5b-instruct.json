@@ -1,0 +1,97 @@
+﻿{
+    "schemaVersion":  1,
+    "evaluatedAt":  "2026-07-29T11:04:03.5523584+09:00",
+    "model":  "qwen2.5:1.5b-instruct",
+    "baseUrl":  "http://localhost:11434",
+    "datasetPath":  "C:\\Users\\user\\IdeaProjects\\DevMentor\\docs\\ai-evaluation-dataset.json",
+    "datasetVersion":  "2026-07-29.1",
+    "settings":  {
+                     "timeoutSeconds":  120,
+                     "maxOutputTokens":  384,
+                     "think":  false,
+                     "temperature":  0,
+                     "promptVersion":  "2026-07-29.1"
+                 },
+    "summary":  {
+                    "total":  2,
+                    "successful":  2,
+                    "structured":  2,
+                    "automaticPass":  0,
+                    "successRate":  1,
+                    "structuredRate":  1,
+                    "automaticPassRate":  0,
+                    "elapsedP95Ms":  11874,
+                    "tutorP95Ms":  null,
+                    "assessmentP95Ms":  11874
+                },
+    "results":  [
+                    {
+                        "id":  "ASSESS-005",
+                        "mode":  "ASSESSMENT",
+                        "category":  "incorrect_answer",
+                        "startedAt":  "2026-07-29T11:03:48.4508974+09:00",
+                        "elapsedMs":  11874,
+                        "automaticPass":  false,
+                        "checks":  {
+                                       "structured":  true,
+                                       "koreanPresent":  true,
+                                       "correct":  true,
+                                       "scoreRange":  true,
+                                       "reviewRequired":  true,
+                                       "feedbackTerms":  false,
+                                       "logicalConsistency":  true
+                                   },
+                        "response":  {
+                                         "score":  1,
+                                         "reviewRequired":  true,
+                                         "feedback":  "JPA와 Hibernate는 서로 다른 프레임워크로 개발되었습니다. JPA는 Java Persistence API의 약자이며, Hibernate는 이를 구현하는 라이브러리입니다. 이 두 개의 프레임워크는 데이터베이스에 대한 접근을 지원하며, 각각의 장단점이 있습니다.",
+                                         "correct":  false,
+                                         "correctAnswer":  "JPA와 Hibernate는 서로 다른 회사가 만든 데이터베이스가 아닙니다. JPA는 Java Persistence API의 약자이며, Hibernate는 이를 구현하는 라이브러리입니다."
+                                     },
+                        "rawContent":  "{\"score\": 1, \"reviewRequired\": true, \"feedback\": \"JPA와 Hibernate는 서로 다른 프레임워크로 개발되었습니다. JPA는 Java Persistence API의 약자이며, Hibernate는 이를 구현하는 라이브러리입니다. 이 두 개의 프레임워크는 데이터베이스에 대한 접근을 지원하며, 각각의 장단점이 있습니다.\",\"correct\": false, \"correctAnswer\":\"JPA와 Hibernate는 서로 다른 회사가 만든 데이터베이스가 아닙니다. JPA는 Java Persistence API의 약자이며, Hibernate는 이를 구현하는 라이브러리입니다.\"}",
+                        "metrics":  {
+                                        "totalDurationNs":  9717844600,
+                                        "loadDurationNs":  5353153500,
+                                        "promptEvalCount":  237,
+                                        "evalCount":  147,
+                                        "evalDurationNs":  3718802000,
+                                        "doneReason":  "stop"
+                                    },
+                        "error":  null
+                    },
+                    {
+                        "id":  "ASSESS-010",
+                        "mode":  "ASSESSMENT",
+                        "category":  "correct_answer",
+                        "startedAt":  "2026-07-29T11:04:00.3525130+09:00",
+                        "elapsedMs":  3178,
+                        "automaticPass":  false,
+                        "checks":  {
+                                       "structured":  true,
+                                       "koreanPresent":  true,
+                                       "correct":  false,
+                                       "scoreRange":  false,
+                                       "reviewRequired":  false,
+                                       "feedbackTerms":  true,
+                                       "logicalConsistency":  false
+                                   },
+                        "response":  {
+                                         "score":  70,
+                                         "reviewRequired":  true,
+                                         "feedback":  "Git branch는 특정 커밋을 가리키는 이동 가능한 포인터입니다. 이는 커밋이 저장된 위치를 나타내며, 앞으로 이동할 수 있는 지점을 의미합니다.",
+                                         "correct":  false,
+                                         "correctAnswer":  "Git branch는 특정 커밋을 가리키는 이동 가능한 포인터이며, 커밋을 통해 앞으로 이동할 수 있습니다."
+                                     },
+                        "rawContent":  "{\"score\": 70, \"reviewRequired\": true, \"feedback\": \"Git branch는 특정 커밋을 가리키는 이동 가능한 포인터입니다. 이는 커밋이 저장된 위치를 나타내며, 앞으로 이동할 수 있는 지점을 의미합니다.\",\"correct\": false, \"correctAnswer\":\"Git branch는 특정 커밋을 가리키는 이동 가능한 포인터이며, 커밋을 통해 앞으로 이동할 수 있습니다.\"}",
+                        "metrics":  {
+                                        "totalDurationNs":  3160755500,
+                                        "loadDurationNs":  171850300,
+                                        "promptEvalCount":  234,
+                                        "evalCount":  103,
+                                        "evalDurationNs":  2719164000,
+                                        "doneReason":  "stop"
+                                    },
+                        "error":  null
+                    }
+                ]
+}

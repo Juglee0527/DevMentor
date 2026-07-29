@@ -195,7 +195,7 @@ app:
 
 ### Task 12. 모델 비교와 기본 모델 확정
 
-상태: `대기`
+상태: `완료 - RAG 개발 기준 모델 확정, 운영 기본 모델 미승인`
 
 비교 항목:
 
@@ -222,9 +222,17 @@ app:
 - 선택·탈락 근거가 `docs/ai-model-evaluation.md`에 기록됨
 - `.env.example`과 실행 문서를 선택 모델에 맞게 갱신함
 
+결과:
+
+- RAG 개발 기준 모델: `qwen2.5:7b-instruct`, Ollama digest `845dbda0ea48`, Q4 계열, Apache-2.0
+- 제품·테스트 기본 모드: `fake` 유지
+- 운영 기본 모델: 필수 정확성 게이트 미달로 승인하지 않음
+- 1.5B는 속도는 충족했지만 평가 논리 오류, 4B/7B는 품질·응답 시간 문제로 전체 36건 실행 전 smoke 중단 기준 적용
+- 상세 근거와 원본 결과는 `docs/ai-model-evaluation.md`, `docs/ai-evaluation-results/`에 기록
+
 ### Task 13. 근거 기반 답변을 위한 RAG
 
-상태: `보류`
+상태: `진행`
 
 착수 조건:
 

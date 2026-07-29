@@ -1,0 +1,97 @@
+﻿{
+    "schemaVersion":  1,
+    "evaluatedAt":  "2026-07-29T11:08:38.0468175+09:00",
+    "model":  "qwen3.5:4b",
+    "baseUrl":  "http://localhost:11434",
+    "datasetPath":  "C:\\Users\\user\\IdeaProjects\\DevMentor\\docs\\ai-evaluation-dataset.json",
+    "datasetVersion":  "2026-07-29.1",
+    "settings":  {
+                     "timeoutSeconds":  120,
+                     "maxOutputTokens":  384,
+                     "think":  false,
+                     "temperature":  0,
+                     "promptVersion":  "2026-07-29.1"
+                 },
+    "summary":  {
+                    "total":  2,
+                    "successful":  2,
+                    "structured":  2,
+                    "automaticPass":  0,
+                    "successRate":  1,
+                    "structuredRate":  1,
+                    "automaticPassRate":  0,
+                    "elapsedP95Ms":  52464,
+                    "tutorP95Ms":  null,
+                    "assessmentP95Ms":  52464
+                },
+    "results":  [
+                    {
+                        "id":  "ASSESS-005",
+                        "mode":  "ASSESSMENT",
+                        "category":  "incorrect_answer",
+                        "startedAt":  "2026-07-29T11:07:21.1680965+09:00",
+                        "elapsedMs":  52464,
+                        "automaticPass":  false,
+                        "checks":  {
+                                       "structured":  true,
+                                       "koreanPresent":  true,
+                                       "correct":  true,
+                                       "scoreRange":  true,
+                                       "reviewRequired":  true,
+                                       "feedbackTerms":  false,
+                                       "logicalConsistency":  true
+                                   },
+                        "response":  {
+                                         "score":  15,
+                                         "reviewRequired":  true,
+                                         "feedback":  "질문하신 JPA 와 Hibernate 의 관계에 대한 답변은 정확하지 않습니다. 둘 다 같은 회사의 제품이 아니며, 서로 다른 기술 스택을 가집니다.\n\n- **JPA (Java Persistence API)** 는 Java 를 위한 추상화된 데이터베이스 접근 인터페이스입니다. 즉, \u0027인터페이스\u0027나 \u0027규격\u0027의 역할을 합니다.\n- **Hibernate**는 이 JPA 규격을 구현한 대표적인 라이브러리 중 하나이며, 실제로 데이터를 관리하는 ORM(객체 관계 매핑) 프레임워크입니다.\n\n즉, Hibernate 는 JPA 를 준수하며 동작합니다. 마치 \"JDK\"와 \"Java SE\"의 관계를 묻듯이, 구체적인 구현体和 추상적 인터페이스의 관계를 이해하셔야 합니다.",
+                                         "correct":  false,
+                                         "correctAnswer":  "\"Hibernate는 Java Persistence API(JPA)를 준수하는 대표적인 ORM(객체 관계 매핑) 프레임워크입니다. JPA 는 데이터베이스 접근을 위한 표준 인터페이스 역할을 하고, Hibernate 는 이 인터페이스를 실제로 구현하여 개발자가 쉽게 데이터를 관리할 수 있도록 돕습니다. 따라서 Hibernate 는 JPA 의 구체적인 하나라고 볼 수 있습니다.\""
+                                     },
+                        "rawContent":  "{\n  \"score\": 15,\n  \"reviewRequired\": true,\n  \"feedback\": \"질문하신 JPA 와 Hibernate 의 관계에 대한 답변은 정확하지 않습니다. 둘 다 같은 회사의 제품이 아니며, 서로 다른 기술 스택을 가집니다.\\n\\n- **JPA (Java Persistence API)** 는 Java 를 위한 추상화된 데이터베이스 접근 인터페이스입니다. 즉, \u0027인터페이스\u0027나 \u0027규격\u0027의 역할을 합니다.\\n- **Hibernate**는 이 JPA 규격을 구현한 대표적인 라이브러리 중 하나이며, 실제로 데이터를 관리하는 ORM(객체 관계 매핑) 프레임워크입니다.\\n\\n즉, Hibernate 는 JPA 를 준수하며 동작합니다. 마치 \\\"JDK\\\"와 \\\"Java SE\\\"의 관계를 묻듯이, 구체적인 구현体和 추상적 인터페이스의 관계를 이해하셔야 합니다.\",\n  \"correct\": false,\n  \"correctAnswer\": \"\\\"Hibernate는 Java Persistence API(JPA)를 준수하는 대표적인 ORM(객체 관계 매핑) 프레임워크입니다. JPA 는 데이터베이스 접근을 위한 표준 인터페이스 역할을 하고, Hibernate 는 이 인터페이스를 실제로 구현하여 개발자가 쉽게 데이터를 관리할 수 있도록 돕습니다. 따라서 Hibernate 는 JPA 의 구체적인 하나라고 볼 수 있습니다.\\\"\"}",
+                        "metrics":  {
+                                        "totalDurationNs":  50263180200,
+                                        "loadDurationNs":  21271671300,
+                                        "promptEvalCount":  210,
+                                        "evalCount":  266,
+                                        "evalDurationNs":  27391881000,
+                                        "doneReason":  "stop"
+                                    },
+                        "error":  null
+                    },
+                    {
+                        "id":  "ASSESS-010",
+                        "mode":  "ASSESSMENT",
+                        "category":  "correct_answer",
+                        "startedAt":  "2026-07-29T11:08:13.6722993+09:00",
+                        "elapsedMs":  24301,
+                        "automaticPass":  false,
+                        "checks":  {
+                                       "structured":  true,
+                                       "koreanPresent":  true,
+                                       "correct":  true,
+                                       "scoreRange":  false,
+                                       "reviewRequired":  true,
+                                       "feedbackTerms":  true,
+                                       "logicalConsistency":  false
+                                   },
+                        "response":  {
+                                         "score":  60,
+                                         "reviewRequired":  false,
+                                         "feedback":  "Git branch의 개념은 \u0027특정 커밋을 가리키는 이동 가능한 포인터\u0027라는 설명이 핵심적으로 맞습니다. 하지만 \u0027커밋하면 앞으로 이동합니다\u0027라는 표현은 다소 모호할 수 있습니다. 정확히는 \u0027브랜치 자체는 특정 커밋에 고정되어 있지만, 브랜치를 변경하거나 다른 브랜지로 전환하면 그 지점을 따라가게 되는 포인터의 개념\u0027입니다. 또한 Git branch 는 단순히 포인터뿐만 아니라 해당 커밋을 기반으로 한 독립적인 작업 공간 (작업 흐름) 을 의미한다는 점도 추가 설명이 필요합니다.",
+                                         "correct":  true,
+                                         "correctAnswer":  "\"Git 브랜치(Git Branch)는 특정 커밋을 가리키는 이동 가능한 포인터입니다. 이 포인터가 지칭하는 커밋의 상태를 기준으로 독립적인 작업 공간을 형성하며, 다른 커밋으로 변경하거나 병합하면 그 위치를 따라갑니다."
+                                     },
+                        "rawContent":  "{\n  \"score\": 60,\n  \"reviewRequired\": false,\n  \"feedback\": \"Git branch의 개념은 \u0027특정 커밋을 가리키는 이동 가능한 포인터\u0027라는 설명이 핵심적으로 맞습니다. 하지만 \u0027커밋하면 앞으로 이동합니다\u0027라는 표현은 다소 모호할 수 있습니다. 정확히는 \u0027브랜치 자체는 특정 커밋에 고정되어 있지만, 브랜치를 변경하거나 다른 브랜지로 전환하면 그 지점을 따라가게 되는 포인터의 개념\u0027입니다. 또한 Git branch 는 단순히 포인터뿐만 아니라 해당 커밋을 기반으로 한 독립적인 작업 공간 (작업 흐름) 을 의미한다는 점도 추가 설명이 필요합니다.\",\n  \"correct\": true,\n  \"correctAnswer\": \"\\\"Git 브랜치(Git Branch)는 특정 커밋을 가리키는 이동 가능한 포인터입니다. 이 포인터가 지칭하는 커밋의 상태를 기준으로 독립적인 작업 공간을 형성하며, 다른 커밋으로 변경하거나 병합하면 그 위치를 따라갑니다.\"\n}",
+                        "metrics":  {
+                                        "totalDurationNs":  24271190300,
+                                        "loadDurationNs":  295700600,
+                                        "promptEvalCount":  211,
+                                        "evalCount":  225,
+                                        "evalDurationNs":  22386558000,
+                                        "doneReason":  "stop"
+                                    },
+                        "error":  null
+                    }
+                ]
+}

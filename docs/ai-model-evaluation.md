@@ -5,8 +5,10 @@
 - 평가 기준일: `2026-07-29`
 - 평가셋 버전: `2026-07-29.1`
 - 평가 케이스: `36개` (`TUTOR` 24개, `ASSESSMENT` 12개)
-- 실제 모델 평가: `미실행`
-- 다음 작업: `Task 10 - Ollama 로컬 모델 연결`
+- 실제 모델 평가: `smoke 완료, 필수 게이트 미달로 전체 평가 중단`
+- 선택 결과: `qwen2.5:7b-instruct`를 RAG 개발 기준 모델로 고정
+- 운영 기본 모델: `미승인`, 제품 기본 모드는 `fake` 유지
+- 다음 작업: `Task 13 - 검수 문서 기반 RAG`
 
 이 문서는 모델을 일반 벤치마크나 선호만으로 선택하지 않고, DevMentor의 실제 응답 계약과 장비 조건으로 비교하기 위한 기준입니다.
 
@@ -19,7 +21,7 @@
 | 내장 GPU | Intel Iris Xe Graphics | 공유 메모리이므로 주 실행 장치로 확정하지 않음 |
 | 외장 GPU | Intel Arc A350M, 보고 VRAM 약 3.9 GiB | Ollama Vulkan 실험 기능 검증 필요 |
 | GPU driver | `31.0.101.5333` | 실제 Vulkan 인식 여부 별도 확인 |
-| Ollama | 명령 미설치 | Task 10에서 설치 필요 |
+| Ollama | Windows `0.32.5` | `/api/chat` 구조화 출력 연결 확인 |
 | NVIDIA 도구 | `nvidia-smi` 없음 | CUDA 경로 사용 불가 |
 
 Windows의 `Win32_VideoController.AdapterRAM` 값은 일부 장치에서 실제 전용 VRAM과 다를 수 있으므로 모델 실행 후 Ollama 로그와 런타임 메모리로 다시 확인합니다.
@@ -28,11 +30,13 @@ Windows의 `Win32_VideoController.AdapterRAM` 값은 일부 장치에서 실제 
 
 | 후보 | 목적 | 장비 적합성 가정 | 상태 |
 | --- | --- | --- | --- |
-| `qwen3:4b-instruct` Q4_K_M | 초기 연결 후보 | 구조화 제약·한국어·속도 기준 미달 | 탈락 후보 |
-| `qwen3.5:4b` | Task 10 연결 후보 | 구조화 응답 성공, 한국어·정오답 품질 기준 미달 | Task 12 평가 대기 |
-| 2B~3B급 Apache 2.0 instruction 모델 | 속도 비교 | 현재 장비에서 4B보다 빠른 후보 필요 | 대기 |
+| `qwen3:4b-instruct` | 초기 연결 후보 | 110.3초, 러시아어, 잘못된 코드와 confidence | 탈락 |
+| `qwen3.5:4b` | 중간 크기 후보 | 한국어·Schema는 성공, 평가 정확성과 52.5초 P95 미달 | 탈락 |
+| `qwen2.5:1.5b-instruct` | 속도 후보 | 11.9초 P95, 평가 논리 불일치 | 탈락 |
+| `granite3.2:2b` | Apache-2.0 대안 | 대표 tutor 2건 완료 전 180초 초과 | 탈락 |
+| `qwen2.5:7b-instruct` | 품질 후보 | 한국어·Schema 안정, 기술 오류와 58.9초 P95 | RAG 개발 기준 |
 
-첫 연결은 `qwen3:4b-instruct`로 시작했으나 실제 결과를 근거로 `qwen3.5:4b`까지 비교했습니다. Task 10에서는 Ollama 연결과 구조화 계약만 검증했으며 운영 기본 모델은 Task 12에서 확정합니다.
+Qwen2.5 1.5B와 7B, Qwen3.5 4B의 원본 smoke 결과는 [ai-evaluation-results](./ai-evaluation-results/)에 보존합니다. 대표 케이스에서 이미 필수 게이트를 위반한 후보는 36건 전체 실행을 중단했습니다. 이는 실패가 확인된 모델에 장시간 전체 평가를 반복하지 않는 명시적 중단 기준입니다.
 
 ## 4. 평가 데이터
 
@@ -114,7 +118,10 @@ Windows의 `Win32_VideoController.AdapterRAM` 값은 일부 장치에서 실제 
 
 | 모델 | 양자화 | 실행 장치 | 구조화 성공률 | 자동 점수 | 수동 점수 | tutor P95 | assessment P95 | 최대 RAM | 판정 |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 미실행 | - | - | - | - | - | - | - | - | 대기 |
+| `qwen2.5:1.5b-instruct` | Q4_K_M | CPU/GPU 혼합 | 2/2 | 0/2 | 미실시 | 미측정 | 11.9초 | 모델 약 1.0GB | 탈락 |
+| `qwen3.5:4b` | Q4_K_M | CPU/GPU 혼합 | 2/2 | 0/2 | 미실시 | 미측정 | 52.5초 | 모델 약 3.8GB | 탈락 |
+| `qwen2.5:7b-instruct` | Q4_K_M | CPU 47% / GPU 53% | 4/4 | 0/4 | 정성 검토 | 58.9초 | 23.1초 | 실행 약 5.1GB | RAG 개발 기준 |
+| `granite3.2:2b` | Q4_K_M | CPU/GPU 혼합 | 완료 전 중단 | - | 미실시 | 180초 초과 | 미측정 | 모델 약 1.5GB | 탈락 |
 
 ### Task 10 예비 실행
 
@@ -126,6 +133,25 @@ Windows의 `Win32_VideoController.AdapterRAM` 값은 일부 장치에서 실제 
 | `qwen3.5:4b` | `think=false`, `num_predict=384`, assessment | 25.2초, 유효 JSON, 정답을 오답으로 판정하고 한국어 지시 미준수 |
 
 Ollama `ps`에서 `qwen3.5:4b`는 약 3.8GB, CPU 41% / GPU 59%로 표시되었습니다. 이 결과는 연결 검증이며 36개 전체 평가 결과가 아닙니다.
+
+### Task 12 비교 실행
+
+공통 설정은 `think=false`, `temperature=0`, 프롬프트 `2026-07-29.1`이며 PowerShell 요청 본문을 UTF-8 바이트로 고정했습니다.
+
+| 모델 | 대표 결과 | 탈락 또는 선택 근거 |
+| --- | --- | --- |
+| `qwen2.5:1.5b-instruct` | assessment 2/2 Schema·한국어 성공 | 70점인데 `correct=false`인 논리 모순, 정답 점수 범위 실패 |
+| `qwen3.5:4b` | assessment 2/2 Schema·한국어 성공 | 두 케이스 모두 자동 기준 실패, P95 52.5초 |
+| `qwen2.5:7b-instruct` | tutor/assessment 4/4 Schema·한국어 성공 | Git branch 사실 오류, 무관 개념 추천, 자동 기준 0/4, tutor P95 58.9초 |
+| `granite3.2:2b` | tutor smoke 실행 | 2건 완료 전 180초를 초과해 성능 기준으로 중단 |
+
+`qwen2.5:7b-instruct`는 비교 후보 중 한국어 설명과 구조화 계약이 가장 안정적이고 Apache-2.0 라이선스이므로 다음 RAG 단계의 재현 가능한 기준 모델로 선택했습니다. 다만 필수 정확성 게이트를 통과하지 못했으므로 운영 승인이나 품질 완료를 의미하지 않습니다.
+
+라이선스·배포 근거:
+
+- [Qwen2.5 Ollama 모델 설명](https://registry.ollama.com/library/qwen2.5): 다국어·구조화 출력 특성과 크기별 라이선스 예외 확인
+- [Qwen2.5 7B Hugging Face](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct): Apache-2.0 라이선스 확인
+- [Granite 3.2 Ollama 모델 설명](https://ollama.com/library/granite3.2): Apache-2.0 라이선스와 지원 언어 확인
 
 각 실행 결과에는 다음 정보를 함께 기록합니다.
 
@@ -148,3 +174,15 @@ Ollama `ps`에서 `qwen3.5:4b`는 약 3.8GB, CPU 41% / GPU 59%로 표시되었�
 - [x] 초기 실행 후보와 미확정 사항 구분
 
 Task 9는 문서와 평가 입력 준비 단계입니다. 실제 모델 품질과 Vulkan GPU 사용 여부는 Task 10~12에서 관찰된 결과로만 확정합니다.
+
+## 10. Task 12 완료 판정
+
+- [x] 동일 프롬프트·Schema·대표 평가 케이스로 후보 비교
+- [x] 한국어, 구조화 출력, 정확성, 평가 논리, 응답 시간 확인
+- [x] 모델 태그, digest, 양자화, 실행 장치, 라이선스 기록
+- [x] 실패 후보의 중단 근거와 원본 결과 보존
+- [x] RAG 개발 기준 모델을 `qwen2.5:7b-instruct`로 고정
+- [x] `.env.example`과 실행 문서 현행화
+- [x] 필수 게이트 미달로 운영 기본 모델을 승인하지 않음
+
+Task 12의 완료는 모델 비교와 다음 기준 모델 선택의 완료입니다. 모델 품질 통과를 뜻하지 않으며, 제품 기본 모드는 안전하게 `fake`를 유지합니다.
